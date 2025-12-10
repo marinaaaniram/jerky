@@ -60,3 +60,23 @@ main {
 #user-info {
     font-size: 0.9rem;
 }
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav {
+        margin-top: 1rem;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav li {
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+    }
+}
