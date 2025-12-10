@@ -19,30 +19,32 @@ async function showLogin() {
         ).join('');
     }
 
-    loginButton.onclick = () => {
+    loginButton.onclick = async () => {
         const userId = userSelect.value;
         const userRes = db.exec(`SELECT u.id, u.name, r.name as role_name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.id = ${userId}`);
         const user = userRes[0].values[0];
         setCurrentUser({ id: user[0], name: user[1], role: user[2] });
-        showApp();
+        await showApp();
     };
 }
 
-function showApp() {
+async function showApp() {
     document.getElementById('login-modal').style.display = 'none';
+    document.querySelector('header').style.display = 'flex';
+    document.querySelector('main').style.display = 'block';
     window.addEventListener('hashchange', () => router(db));
-    updateNavigation();
-    updateUserInfo();
+    await updateNavigation();
+    await updateUserInfo();
     router(db); // Initial route
 }
 
 async function main() {
     db = await initDatabase();
 
-    if (getCurrentUser()) {
-        showApp();
+    if (await getCurrentUser()) {
+        await showApp();
     } else {
-        showLogin();
+        await showLogin();
     }
 }
 

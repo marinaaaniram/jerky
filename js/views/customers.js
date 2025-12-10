@@ -24,7 +24,7 @@ export async function renderCustomers(db, router) {
     table += '</tbody></table>';
 
     let formHtml = '';
-    if (canEdit()) {
+    if (await canEdit()) {
         formHtml = `<h3>Добавить клиента</h3>
                     <form id="add-customer-form">
                         <input type="text" name="name" placeholder="Имя" required>
@@ -44,7 +44,7 @@ export async function renderCustomers(db, router) {
         router();
     });
 
-    if (canEdit()) {
+    if (await canEdit()) {
         document.getElementById('add-customer-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);

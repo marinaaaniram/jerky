@@ -14,7 +14,7 @@ export async function renderProducts(db, router) {
     table += '</tbody></table>';
 
     let formsHtml = '';
-    if (canManageStock()) {
+    if (await canManageStock()) {
         const productOptions = products.length ? products[0].values.map(p => `<option value="${p[0]}">${p[1]}</option>`).join('') : '';
         formsHtml = `
             <hr><h3>Управление складом</h3>
@@ -36,7 +36,7 @@ export async function renderProducts(db, router) {
     }
     content.innerHTML = `<h2>Товары</h2>${table}${formsHtml}`;
     
-    if (canManageStock()) {
+    if (await canManageStock()) {
         document.getElementById('stock-in-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = new FormData(e.target);

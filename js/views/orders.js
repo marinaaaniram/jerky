@@ -20,7 +20,7 @@ export async function renderOrders(db, router) {
     table += '</tbody></table>';
 
     let formHtml = '';
-    if (canManageStock()) {
+    if (await canManageStock()) {
         const customers = db.exec("SELECT id, name FROM customers WHERE is_archived = 0");
         let customerOptions = customers.length ? customers[0].values.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('') : '';
         formHtml = `<h3>Новый заказ</h3>
@@ -40,7 +40,7 @@ export async function renderOrders(db, router) {
         router();
     });
 
-    if (canManageStock()) {
+    if (await canManageStock()) {
         document.getElementById('add-order-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);

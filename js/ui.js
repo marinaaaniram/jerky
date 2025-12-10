@@ -4,16 +4,16 @@ import { getCurrentUser, logout, hasPermission } from './auth.js';
 const navLinks = document.getElementById('nav-links');
 const userInfo = document.getElementById('user-info');
 
-export function updateNavigation() {
+export async function updateNavigation() {
     navLinks.innerHTML = '';
-    if (hasPermission('orders')) navLinks.innerHTML += `<li><a href="#orders">Заказы</a></li>`;
-    if (hasPermission('products')) navLinks.innerHTML += `<li><a href="#products">Товары</a></li>`;
-    if (hasPermission('customers')) navLinks.innerHTML += `<li><a href="#customers">Клиенты</a></li>`;
-    if (hasPermission('reports')) navLinks.innerHTML += `<li><a href="#reports">Отчеты</a></li>`;
+    if (await hasPermission('orders')) navLinks.innerHTML += `<li><a href="#orders">Заказы</a></li>`;
+    if (await hasPermission('products')) navLinks.innerHTML += `<li><a href="#products">Товары</a></li>`;
+    if (await hasPermission('customers')) navLinks.innerHTML += `<li><a href="#customers">Клиенты</a></li>`;
+    if (await hasPermission('reports')) navLinks.innerHTML += `<li><a href="#reports">Отчеты</a></li>`;
 }
 
-export function updateUserInfo() {
-    const user = getCurrentUser();
+export async function updateUserInfo() {
+    const user = await getCurrentUser();
     if (!user) {
         userInfo.innerHTML = '';
         return;

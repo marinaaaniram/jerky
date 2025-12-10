@@ -18,7 +18,7 @@ export async function renderOrderDetails(db, router, orderId) {
                 <a href="#orders">&larr; Назад к заказам</a>
                 <button id="print-invoice-btn" style="margin-left: 20px;">Печать накладной</button>`;
 
-    if (canChangeStatus() && o_status !== 'Доставлен') {
+    if (await canChangeStatus() && o_status !== 'Доставлен') {
         const statuses = ['Новый', 'В сборке', 'Передан курьеру', 'Доставлен'];
         const statusOptions = statuses.map(s => `<option value="${s}" ${s === o_status ? 'selected' : ''}>${s}</option>`).join('');
         html += `<hr><h3>Изменить статус</h3>
@@ -39,7 +39,7 @@ export async function renderOrderDetails(db, router, orderId) {
     itemsTable += `</tbody><tfoot><tr><th colspan="3">Итого:</th><th>${total.toFixed(2)}</th></tr></tfoot></table>`;
     html += itemsTable;
 
-    if (canManageStock() && o_status !== 'Доставлен') {
+    if (await canManageStock() && o_status !== 'Доставлен') {
         const productsRes = db.exec("SELECT id, name, stock_quantity FROM products WHERE stock_quantity > 0");
         let productOptions = productsRes.length ? productsRes[0].values.map(p => `<option value="${p[0]}">${p[1]} (на складе: ${p[2]})</option>`).join('') : '';
         html += `<h3>Добавить товар</h3>
@@ -63,7 +63,7 @@ export async function renderOrderDetails(db, router, orderId) {
                     <p><em>Заполнено: ${survey[4]}</em></p>
                  </div>`;
     } else if (o_status !== 'Доставлен') {
-        const isCourierAndReady = isCourier() && o_status === 'Передан курьеру';
+        const isCourierAndReady = await isCourier() && o_status === 'Передан курьеру';
         html += `<form id="survey-form">
                     <fieldset ${!isCourierAndReady ? 'disabled' : ''}>
                         <label>Фото-подтверждение: <input type="file" name="photo"></label>
@@ -109,7 +109,7 @@ export async function renderOrderDetails(db, router, orderId) {
         });
     }
     
-    if (canChangeStatus() && o_status !== 'Доставлен') {
+    if (await canChangeStatus() && o_status !== 'Доставлен') {
         document.getElementById('update-status-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const newStatus = new FormData(e.target).get('status');
@@ -132,7 +132,7 @@ export async function renderOrderDetails(db, router, orderId) {
         });
     }
 
-    if (canManageStock() && o_status !== 'Доставлен') {
+    if (await canManageStock() && o_status !== 'Доставлен') {
         document.getElementById('add-item-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = new FormData(e.target);

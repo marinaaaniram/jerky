@@ -10,7 +10,7 @@ const rolePermissions = {
     'Наблюдатель': ['orders', 'products', 'customers', 'reports', 'customer', 'order']
 };
 
-export function getCurrentUser() {
+export async function getCurrentUser() {
     if (!currentUser) {
         const userData = sessionStorage.getItem('currentUser');
         if (userData) {
@@ -32,33 +32,33 @@ export function logout() {
     window.location.reload();
 }
 
-export function hasPermission(page) {
-    const user = getCurrentUser();
+export async function hasPermission(page) {
+    const user = await getCurrentUser();
     if (!user) return false;
     const permissions = rolePermissions[user.role] || [];
     return permissions.includes(page);
 }
 
-export function canEdit() {
-    const user = getCurrentUser();
+export async function canEdit() {
+    const user = await getCurrentUser();
     if (!user) return false;
     return ['Руководитель', 'Менеджер по продажам'].includes(user.role);
 }
 
-export function canManageStock() {
-    const user = getCurrentUser();
+export async function canManageStock() {
+    const user = await getCurrentUser();
     if (!user) return false;
     return ['Руководитель', 'Кладовщик'].includes(user.role);
 }
 
-export function canChangeStatus() {
-    const user = getCurrentUser();
+export async function canChangeStatus() {
+    const user = await getCurrentUser();
     if (!user) return false;
     return ['Руководитель', 'Кладовщик', 'Курьер'].includes(user.role);
 }
 
-export function isCourier() {
-    const user = getCurrentUser();
+export async function isCourier() {
+    const user = await getCurrentUser();
     if (!user) return false;
     return user.role === 'Курьер';
 }

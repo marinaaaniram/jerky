@@ -15,7 +15,7 @@ export async function renderCustomerDetails(db, router, customerId) {
                 <p><strong>Тип оплаты:</strong> ${payment_type}</p><p><strong>Текущий долг:</strong> ${debt.toFixed(2)}</p>
                 <a href="#customers">&larr; Назад к клиентам</a><hr>`;
 
-    if (canEdit()) {
+    if (await canEdit()) {
         const archiveBtnText = is_archived ? 'Восстановить из архива' : 'Архивировать';
         html += `<button id="archive-customer-btn">${archiveBtnText}</button><hr>`;
         html += `<h3>Внести платеж</h3>
@@ -38,7 +38,7 @@ export async function renderCustomerDetails(db, router, customerId) {
     html += paymentsTable;
 
     html += `<h3>Специальные цены</h3>`;
-    if (canEdit()) {
+    if (await canEdit()) {
         const productsRes = db.exec("SELECT id, name FROM products");
         let productOptions = productsRes.length ? productsRes[0].values.map(p => `<option value="${p[0]}">${p[1]}</option>`).join('') : '';
         html += `<form id="add-price-rule-form">
@@ -60,7 +60,7 @@ export async function renderCustomerDetails(db, router, customerId) {
 
     content.innerHTML = html;
 
-    if (canEdit()) {
+    if (await canEdit()) {
         document.getElementById('archive-customer-btn').addEventListener('click', async () => {
             const newStatus = is_archived ? 0 : 1;
             db.run("UPDATE customers SET is_archived = ? WHERE id = ?", [newStatus, customerId]);
