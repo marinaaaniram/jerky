@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jerky</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Выберите пользователя</h2>
+            <select id="user-select"></select>
+            <button id="login-button">Войти</button>
+        </div>
+    </div>
+
+    <header>
+        <h1>Jerky</h1>
+        <div id="user-info"></div>
+        <nav>
+            <ul id="nav-links">
+                <!-- Links will be populated by JS based on role -->
+            </ul>
+        </nav>
+    </header>
+    <main id="content">
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
