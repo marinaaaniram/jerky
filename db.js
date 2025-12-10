@@ -1,4 +1,5 @@
 // js/db.js
+import { populateDbWithFakeData } from './populate_db.js';
 
 function populate(db) {
     // --- Table Definitions ---
@@ -43,6 +44,7 @@ export async function initDatabase() {
     const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table'");
     if (tables.length === 0) {
         populate(db);
+        populateDbWithFakeData(db);
     }
     return db;
 }
