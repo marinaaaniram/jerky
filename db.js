@@ -1,13 +1,7 @@
-let db;
+// js/db.js
 
-async function initDatabase() {
-    const SQL = await initSqlJs({
-        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
-    });
-    db = new SQL.Database();
-
+function populate(db) {
     // --- Table Definitions ---
-
     db.run(`CREATE TABLE customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, address TEXT, phone TEXT, payment_type TEXT DEFAULT 'прямые', debt REAL DEFAULT 0, is_archived INTEGER DEFAULT 0);`);
     db.run(`CREATE TABLE payments (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER, amount REAL, payment_date TEXT, FOREIGN KEY (customer_id) REFERENCES customers (id));`);
     db.run(`CREATE TABLE products (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, price REAL, stock_quantity INTEGER DEFAULT 0);`);
@@ -17,23 +11,9 @@ async function initDatabase() {
     db.run(`CREATE TABLE roles (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE);`);
     db.run(`CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, role_id INTEGER, FOREIGN KEY (role_id) REFERENCES roles (id));`);
     db.run(`CREATE TABLE price_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, customer_id INTEGER, product_id INTEGER, special_price REAL, FOREIGN KEY (customer_id) REFERENCES customers (id), FOREIGN KEY (product_id) REFERENCES products (id), UNIQUE(customer_id, product_id));`);
-    
-    // Delivery surveys table
-    db.run(`
-        CREATE TABLE delivery_surveys (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_id INTEGER UNIQUE,
-            photo_url TEXT,
-            stock_check_notes TEXT,
-            layout_notes TEXT,
-            other_notes TEXT,
-            timestamp TEXT,
-            FOREIGN KEY (order_id) REFERENCES orders (id)
-        );
-    `);
+    db.run(`CREATE TABLE delivery_surveys (id INTEGER PRIMARY KEY AUTOINCREMENT, order_id INTEGER UNIQUE, photo_url TEXT, stock_check_notes TEXT, layout_notes TEXT, other_notes TEXT, timestamp TEXT, FOREIGN KEY (order_id) REFERENCES orders (id));`);
 
     // --- Data Population ---
-
     const roles = ['Руководитель', 'Менеджер по продажам', 'Кладовщик', 'Курьер', 'Наблюдатель'];
     roles.forEach(role => { db.run("INSERT INTO roles (name) VALUES (?)", [role]); });
 
@@ -53,5 +33,16 @@ async function initDatabase() {
     db.run("INSERT INTO price_rules (customer_id, product_id, special_price) VALUES (2, 1, 9.50)");
 }
 
-// Make initDatabase globally accessible
-window.initDatabase = initDatabase;
+
+export async function initDatabase() {
+    const SQL = await initSqlJs({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
+    });
+    const db = new SQL.Database();
+    // Check if db is empty
+    const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table'");
+    if (tables.length === 0) {
+        populate(db);
+    }
+    return db;
+}
