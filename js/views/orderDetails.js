@@ -18,6 +18,16 @@ async function applyDeliveryActions(db, orderId, c_id, total) {
     }
 }
 
+// Вспомогательная функция для чтения файла как Base64
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+
 export async function renderOrderDetails(db, router, orderId) {
     const content = document.getElementById('content');
     
@@ -95,6 +105,7 @@ export async function renderOrderDetails(db, router, orderId) {
 
     if (surveyExists) {
         const survey = surveyRes[0].values[0];
+        // Используем Base64 напрямую в src
         surveyHtml += `<div class="survey-display">
                         <div class="survey-item"><strong>Фото-подтверждение:</strong> ${survey[0] ? `<a href="${survey[0]}" target="_blank"><img src="${survey[0]}" alt="Фото" class="survey-photo"></a>` : 'Нет'}</div>
                         <div class="survey-item"><strong>Проверка остатков:</strong> <p>${survey[1] || 'Нет'}</p></div>
@@ -108,12 +119,12 @@ export async function renderOrderDetails(db, router, orderId) {
                         <fieldset ${!isCourierAndReady ? 'disabled' : ''}>
                             <div>
                                 <label for="photo-upload">Фото-подтверждение</label>
-                                <input type="file" name="photo" id="photo-upload" accept="image/*">
+                                <input type="file" name="photo" id="photo-upload" accept="image/*" required>
                                 <label for="photo-upload" class="custom-file-upload">Выберите файл...</label>
                             </div>
-                            <div><label for="stock_notes">Заметки по остаткам:</label><textarea id="stock_notes" name="stock_notes"></textarea></div>
-                            <div><label for="layout_notes">Заметки по выкладке:</label><textarea id="layout_notes" name="layout_notes"></textarea></div>
-                            <div><label for="other_notes">Прочие заметки:</label><textarea id="other_notes" name="other_notes"></textarea></div>
+                            <div><label for="stock_notes">Заметки по остаткам:</label><textarea id="stock_notes" name="stock_notes" required></textarea></div>
+                            <div><label for="layout_notes">Заметки по выкладке:</label><textarea id="layout_notes" name="layout_notes" required></textarea></div>
+                            <div><label for="other_notes">Прочие заметки:</label><textarea id="other_notes" name="other_notes" required></textarea></div>
                             <button type="submit">Отправить анкету</button>
                         </fieldset>
                         ${!isCourierAndReady ? '<p><em>Анкету можно заполнить, когда заказ передан курьеру.</em></p>' : ''}
@@ -155,9 +166,20 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             e.preventDefault();
             const formData = new FormData(e.target);
             const photoFile = formData.get('photo');
-            const photoUrl = photoFile && photoFile.size > 0 ? `images/${photoFile.name}` : null;
+            let photoBase64 = null;
+
+            if (photoFile && photoFile.size > 0) {
+                try {
+                    photoBase64 = await readFileAsBase64(photoFile);
+                } catch (error) {
+                    console.error("Ошибка чтения файла:", error);
+                    alert("Не удалось прочитать файл изображения.");
+                    return;
+                }
+            }
+            
             db.run("INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [
-                orderId, photoUrl, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
+                orderId, photoBase64, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
             ]);
             renderOrderDetails(db, router, orderId);
         });
@@ -220,11 +242,21 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             console.log(`[Order ${orderId}] Отправка анкеты из модального окна.`);
             const formData = new FormData(e.target);
             const photoFile = formData.get('photo');
-            const photoUrl = photoFile && photoFile.size > 0 ? `images/${photoFile.name}` : null;
+            let photoBase64 = null;
+
+            if (photoFile && photoFile.size > 0) {
+                try {
+                    photoBase64 = await readFileAsBase64(photoFile);
+                } catch (error) {
+                    console.error("Ошибка чтения файла:", error);
+                    alert("Не удалось прочитать файл изображения.");
+                    return;
+                }
+            }
 
             // Сохраняем анкету
             db.run("INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [
-                orderId, photoUrl, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
+                orderId, photoBase64, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
             ]);
             console.log(`[Order ${orderId}] Анкета сохранена.`);
 
