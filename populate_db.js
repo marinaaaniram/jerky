@@ -103,18 +103,5 @@ export function populateDbWithFakeData(db) {
                 );
             }
         }
-
-        // Delivery Survey
-        if (orderStatus === 'Доставлен' && faker.datatype.boolean(0.7)) {
-            const photoUrl = faker.image.url();
-            const stockCheckNotes = faker.lorem.sentence();
-            const layoutNotes = faker.lorem.sentence();
-            const otherNotes = faker.lorem.sentence();
-            const timestamp = faker.date.recent().toISOString().slice(0, 19).replace('T', ' ');
-            db.run(
-                "INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
-                [orderId, photoUrl, stockCheckNotes, layoutNotes, otherNotes, timestamp]
-            );
-        }
     }
 }

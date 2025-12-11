@@ -1,6 +1,23 @@
 // js/views/orderDetails.js
 import { canChangeStatus, canManageStock, isCourier } from '../auth.js';
 
+// Вспомогательная функция для применения действий при доставке
+async function applyDeliveryActions(db, orderId, c_id, total) {
+    // Если анкета заполнена и статус меняется на "Доставлен", применяем изменения по складу/долгу
+    const customerRes = db.exec(`SELECT payment_type FROM customers WHERE id = ${c_id}`);
+    if (customerRes.length && customerRes[0].values[0][0] === 'реализация') {
+        db.run(`UPDATE customers SET debt = debt + ? WHERE id = ?`, [total, c_id]);
+    }
+    const orderItems = db.exec(`SELECT product_id, quantity FROM order_items WHERE order_id = ${orderId}`);
+    if (orderItems.length) {
+        orderItems[0].values.forEach(item => {
+            const [productId, quantity] = item;
+            db.run("UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?", [quantity, productId]);
+            db.run("INSERT INTO stock_movements (product_id, quantity_change, reason, movement_date) VALUES (?, ?, 'продажа', ?)", [productId, -quantity, new Date().toISOString().slice(0, 10)]);
+        });
+    }
+}
+
 export async function renderOrderDetails(db, router, orderId) {
     const content = document.getElementById('content');
     
@@ -72,9 +89,11 @@ export async function renderOrderDetails(db, router, orderId) {
                          </div>`;
     }
 
-    let surveyHtml = `<div class="page-section"><h3>Анкета курьера</h3>`;
+    let surveyHtml = `<div id="survey-section" class="page-section"><h3>Анкета курьера</h3>`;
     const surveyRes = db.exec(`SELECT photo_url, stock_check_notes, layout_notes, other_notes, timestamp FROM delivery_surveys WHERE order_id = ${orderId}`);
-    if (surveyRes.length) {
+    const surveyExists = surveyRes.length > 0;
+
+    if (surveyExists) {
         const survey = surveyRes[0].values[0];
         surveyHtml += `<div class="survey-display">
                         <div class="survey-item"><strong>Фото-подтверждение:</strong> ${survey[0] ? `<a href="${survey[0]}" target="_blank"><img src="${survey[0]}" alt="Фото" class="survey-photo"></a>` : 'Нет'}</div>
@@ -83,7 +102,7 @@ export async function renderOrderDetails(db, router, orderId) {
                         <div class="survey-item"><strong>Прочее:</strong> <p>${survey[3] || 'Нет'}</p></div>
                         <p><em>Заполнено: ${survey[4]}</em></p>
                      </div>`;
-    } else if (o_status !== 'Доставлен') {
+    } else {
         const isCourierAndReady = await isCourier() && o_status === 'Передан курьеру';
         surveyHtml += `<form id="survey-form" class="add-form">
                         <fieldset ${!isCourierAndReady ? 'disabled' : ''}>
@@ -99,8 +118,6 @@ export async function renderOrderDetails(db, router, orderId) {
                         </fieldset>
                         ${!isCourierAndReady ? '<p><em>Анкету можно заполнить, когда заказ передан курьеру.</em></p>' : ''}
                      </form>`;
-    } else {
-        surveyHtml += `<p>Анкета не была заполнена.</p>`;
     }
     surveyHtml += `</div>`;
 
@@ -138,8 +155,6 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             e.preventDefault();
             const formData = new FormData(e.target);
             const photoFile = formData.get('photo');
-            // In a real app, you would upload the file and get a URL.
-            // For this example, we'll just use the file name as a placeholder.
             const photoUrl = photoFile && photoFile.size > 0 ? `images/${photoFile.name}` : null;
             db.run("INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [
                 orderId, photoUrl, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
@@ -153,22 +168,85 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
         updateStatusForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newStatus = new FormData(e.target).get('status');
+            
+            console.log(`[Order ${orderId}] Текущий статус: ${o_status}, Новый статус: ${newStatus}`);
+
+            if (newStatus === o_status) {
+                console.log(`[Order ${orderId}] Статус не изменился. Перерисовка.`);
+                renderOrderDetails(db, router, orderId);
+                return;
+            }
+
             if (newStatus === 'Доставлен') {
-                const customerRes = db.exec(`SELECT payment_type FROM customers WHERE id = ${c_id}`);
-                if (customerRes[0].values[0][0] === 'реализация') {
-                    db.run(`UPDATE customers SET debt = debt + ? WHERE id = ?`, [total, c_id]);
-                }
-                const orderItems = db.exec(`SELECT product_id, quantity FROM order_items WHERE order_id = ${orderId}`);
-                if (orderItems.length) {
-                    orderItems[0].values.forEach(item => {
-                        const [productId, quantity] = item;
-                        db.run("UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?", [quantity, productId]);
-                        db.run("INSERT INTO stock_movements (product_id, quantity_change, reason, movement_date) VALUES (?, ?, 'продажа', ?)", [productId, -quantity, new Date().toISOString().slice(0, 10)]);
-                    });
+                console.log(`[Order ${orderId}] Попытка перевести в статус "Доставлен".`);
+                const surveyCheck = db.exec(`SELECT COUNT(*) FROM delivery_surveys WHERE order_id = ${orderId}`);
+                const surveyExists = surveyCheck.length > 0 && surveyCheck[0].values[0][0] > 0;
+                console.log(`[Order ${orderId}] Результат проверки анкеты: surveyExists = ${surveyExists}`);
+
+                if (!surveyExists) {
+                    console.log(`[Order ${orderId}] Анкета не заполнена. Показываем модальное окно.`);
+                    const surveyModal = document.getElementById('survey-modal');
+                    if (surveyModal) {
+                        surveyModal.style.display = 'flex';
+                        console.log(`[Order ${orderId}] Модальное окно найдено и display установлено в 'flex'.`);
+                    } else {
+                        console.error(`[Order ${orderId}] Ошибка: Элемент #survey-modal не найден в DOM.`);
+                    }
+
+                    // Устанавливаем текущий статус обратно, чтобы селект не менялся
+                    e.target.querySelector('select[name="status"]').value = o_status;
+                    return; // Прерываем выполнение, статус не обновляется здесь
+                } else {
+                    console.log(`[Order ${orderId}] Анкета уже заполнена. Применяем действия доставки.`);
+                    await applyDeliveryActions(db, orderId, c_id, total);
                 }
             }
+            
+            // Обновляем статус заказа в базе данных
+            console.log(`[Order ${orderId}] Обновляем статус на: ${newStatus}`);
             db.run("UPDATE orders SET status = ? WHERE id = ?", [newStatus, orderId]);
             renderOrderDetails(db, router, orderId);
+        });
+    }
+
+    // Обработчики для модального окна анкеты
+    const surveyModal = document.getElementById('survey-modal');
+    const modalSurveyForm = document.getElementById('modal-survey-form');
+    const cancelSurveyButton = document.getElementById('cancel-survey-button');
+
+    if (modalSurveyForm) {
+        modalSurveyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log(`[Order ${orderId}] Отправка анкеты из модального окна.`);
+            const formData = new FormData(e.target);
+            const photoFile = formData.get('photo');
+            const photoUrl = photoFile && photoFile.size > 0 ? `images/${photoFile.name}` : null;
+
+            // Сохраняем анкету
+            db.run("INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [
+                orderId, photoUrl, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
+            ]);
+            console.log(`[Order ${orderId}] Анкета сохранена.`);
+
+            // Применяем действия по доставке
+            await applyDeliveryActions(db, orderId, c_id, total);
+            console.log(`[Order ${orderId}] Действия доставки применены.`);
+
+            // Обновляем статус заказа на "Доставлен"
+            db.run("UPDATE orders SET status = ? WHERE id = ?", ['Доставлен', orderId]);
+            console.log(`[Order ${orderId}] Статус заказа обновлен на "Доставлен".`);
+
+            // Скрываем модальное окно и перерисовываем страницу
+            if (surveyModal) surveyModal.style.display = 'none';
+            renderOrderDetails(db, router, orderId);
+        });
+    }
+
+    if (cancelSurveyButton) {
+        cancelSurveyButton.addEventListener('click', () => {
+            console.log(`[Order ${orderId}] Отмена заполнения анкеты.`);
+            if (surveyModal) surveyModal.style.display = 'none';
+            renderOrderDetails(db, router, orderId); // Перерисовываем, чтобы сбросить выбранный статус
         });
     }
 
@@ -181,7 +259,7 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             const quantity = parseInt(data.get('quantity'));
             
             const stockRes = db.exec(`SELECT stock_quantity FROM products WHERE id = ${productId}`);
-            if (quantity > stockRes[0].values[0][0]) {
+            if (stockRes.length && quantity > stockRes[0].values[0][0]) {
                 alert(`Недостаточно товара на складе!`);
                 return;
             }
@@ -192,7 +270,7 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
                 price = priceRuleRes[0].values[0][0];
             } else {
                 const productPriceRes = db.exec(`SELECT price FROM products WHERE id = ${productId}`);
-                price = productPriceRes[0].values[0][0];
+                price = productPriceRes.length ? productPriceRes[0].values[0][0] : 0;
             }
             
             db.run("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)", [orderId, productId, quantity, price]);

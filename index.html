@@ -17,6 +17,27 @@
         </div>
     </div>
 
+    <!-- Survey Modal -->
+    <div id="survey-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Анкета курьера</h2>
+            <form id="modal-survey-form" class="add-form">
+                <div>
+                    <label for="modal-photo-upload">Фото-подтверждение</label>
+                    <input type="file" name="photo" id="modal-photo-upload" accept="image/*" required>
+                    <label for="modal-photo-upload" class="custom-file-upload">Выберите файл...</label>
+                </div>
+                <div><label for="modal-stock_notes">Заметки по остаткам:</label><textarea id="modal-stock_notes" name="stock_notes" required></textarea></div>
+                <div><label for="modal-layout_notes">Заметки по выкладке:</label><textarea id="modal-layout_notes" name="layout_notes" required></textarea></div>
+                <div><label for="modal-other_notes">Прочие заметки:</label><textarea id="modal-other_notes" name="other_notes" required></textarea></div>
+                <div class="form-actions">
+                    <button type="submit">Отправить анкету и Доставить</button>
+                    <button type="button" id="cancel-survey-button" class="button-secondary">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <header style="display: none;">
         <h1>Jerky</h1>
         <div id="user-info"></div>

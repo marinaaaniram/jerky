@@ -250,6 +250,24 @@ main {
     text-decoration: none;
 }
 
+.button-secondary {
+    background-color: var(--secondary-color);
+}
+
+.button-secondary:hover {
+    background-color: var(--secondary-hover);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-unit);
+    margin-top: var(--spacing-unit);
+}
+
+.form-actions button {
+    flex: 1;
+}
+
 /* 5. Components (Status, Survey, Modal)
 -------------------------------------------------- */
 /* Status labels */
