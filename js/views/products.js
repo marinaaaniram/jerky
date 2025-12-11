@@ -5,7 +5,7 @@ export async function renderProducts(db, router) {
     const content = document.getElementById('content');
 
     const products = db.exec("SELECT id, name, price, stock_quantity FROM products");
-    let table = '<table><thead><tr><th>ID</th><th>Название</th><th>Цена</th><th>На складе</th></tr></thead><tbody>';
+    let table = '<table class="data-table"><thead><tr><th>ID</th><th>Название</th><th>Цена</th><th>На складе</th></tr></thead><tbody>';
     if (products.length) {
         products[0].values.forEach(p => {
             table += `<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2].toFixed(2)}</td><td>${p[3]}</td></tr>`;
@@ -17,24 +17,30 @@ export async function renderProducts(db, router) {
     if (await canManageStock()) {
         const productOptions = products.length ? products[0].values.map(p => `<option value="${p[0]}">${p[1]}</option>`).join('') : '';
         formsHtml = `
-            <hr><h3>Управление складом</h3>
-            <div class="stock-forms" style="display: flex; gap: 20px;">
-                <form id="stock-in-form">
-                    <h4>Приход</h4>
-                    <select name="product_id" required>${productOptions}</select>
-                    <input type="number" name="quantity" min="1" placeholder="Количество" required>
-                    <button type="submit">Оприходовать</button>
-                </form>
-                <form id="stock-out-form">
-                    <h4>Списание</h4>
-                    <select name="product_id" required>${productOptions}</select>
-                    <input type="number" name="quantity" min="1" placeholder="Количество" required>
-                    <button type="submit">Списать</button>
-                </form>
+            <div class="form-container">
+                <h3>Управление складом</h3>
+                <div class="stock-forms">
+                    <form id="stock-in-form" class="add-form">
+                        <h4>Приход</h4>
+                        <div class="form-row">
+                            <select name="product_id" required>${productOptions}</select>
+                            <input type="number" name="quantity" min="1" placeholder="Количество" required>
+                        </div>
+                        <button type="submit">Оприходовать</button>
+                    </form>
+                    <form id="stock-out-form" class="add-form">
+                        <h4>Списание</h4>
+                        <div class="form-row">
+                            <select name="product_id" required>${productOptions}</select>
+                            <input type="number" name="quantity" min="1" placeholder="Количество" required>
+                        </div>
+                        <button type="submit">Списать</button>
+                    </form>
+                </div>
             </div>
         `;
     }
-    content.innerHTML = `<h2>Товары</h2>${table}${formsHtml}`;
+    content.innerHTML = `<h2>Товары</h2><div class="page-content">${table}${formsHtml}</div>`;
     
     if (await canManageStock()) {
         document.getElementById('stock-in-form').addEventListener('submit', async (e) => {

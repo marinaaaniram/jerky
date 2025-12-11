@@ -9,7 +9,7 @@ export async function renderCustomers(db, router) {
     const query = showArchived ? "SELECT id, name, payment_type, debt, is_archived FROM customers" : "SELECT id, name, payment_type, debt, is_archived FROM customers WHERE is_archived = 0";
     const customers = db.exec(query);
     
-    let table = '<table><thead><tr><th>ID</th><th>Имя</th><th>Тип оплаты</th><th>Долг</th><th>Статус</th></tr></thead><tbody>';
+    let table = '<table class="data-table"><thead><tr><th>ID</th><th>Имя</th><th>Тип оплаты</th><th>Долг</th><th>Статус</th></tr></thead><tbody>';
     if (customers.length) {
         customers[0].values.forEach(c => {
             table += `<tr ${c[4] ? 'style="opacity: 0.5;"' : ''}>
@@ -25,19 +25,25 @@ export async function renderCustomers(db, router) {
 
     let formHtml = '';
     if (await canEdit()) {
-        formHtml = `<h3>Добавить клиента</h3>
-                    <form id="add-customer-form">
-                        <input type="text" name="name" placeholder="Имя" required>
-                        <input type="text" name="address" placeholder="Адрес" required>
-                        <input type="text" name="phone" placeholder="Телефон" required>
-                        <select name="payment_type"><option value="прямые">Прямые</option><option value="реализация">Реализация</option></select>
-                        <button type="submit">Добавить</button>
-                    </form>`;
+        formHtml = `<div class="form-container">
+                        <h3>Добавить клиента</h3>
+                        <form id="add-customer-form" class="add-form">
+                            <div class="form-row">
+                                <input type="text" name="name" placeholder="Имя" required>
+                                <input type="text" name="address" placeholder="Адрес" required>
+                            </div>
+                            <div class="form-row">
+                                <input type="text" name="phone" placeholder="Телефон" required>
+                                <select name="payment_type"><option value="прямые">Прямые</option><option value="реализация">Реализация</option></select>
+                            </div>
+                            <button type="submit">Добавить</button>
+                        </form>
+                    </div>`;
     }
 
-    const controls = `<div><label><input type="checkbox" id="show-archived-checkbox" ${showArchived ? 'checked' : ''}> Показать архивные</label></div>`;
+    const controls = `<div class="controls"><label><input type="checkbox" id="show-archived-checkbox" ${showArchived ? 'checked' : ''}> Показать архивные</label></div>`;
 
-    content.innerHTML = `<h2>Клиенты</h2>${controls}${table}${formHtml}`;
+    content.innerHTML = `<h2>Клиенты</h2><div class="page-content">${controls}${table}${formHtml}</div>`;
 
     document.getElementById('show-archived-checkbox').addEventListener('change', (e) => {
         showArchived = e.target.checked;

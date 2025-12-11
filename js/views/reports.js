@@ -4,13 +4,17 @@ export async function renderReports(db) {
     const content = document.getElementById('content');
 
     let html = `<h2>Отчеты</h2>
-                <h3>Продажи по товарам</h3>
-                <form id="sales-report-form">
-                    <label>С: <input type="date" name="start_date"></label>
-                    <label>По: <input type="date" name="end_date"></label>
-                    <button type="submit">Сформировать</button>
-                </form>
-                <div id="report-results"></div>`;
+                <div class="page-section form-container">
+                    <h3>Продажи по товарам</h3>
+                    <form id="sales-report-form" class="add-form">
+                        <div class="form-row">
+                            <label>С: <input type="date" name="start_date"></label>
+                            <label>По: <input type="date" name="end_date"></label>
+                        </div>
+                        <button type="submit">Сформировать</button>
+                    </form>
+                </div>
+                <div id="report-results" class="page-section"></div>`;
     content.innerHTML = html;
 
     document.getElementById('sales-report-form').addEventListener('submit', (e) => {
@@ -39,7 +43,7 @@ export async function renderReports(db) {
 
         const reportRes = db.exec(query, params);
         
-        let table = '<table><thead><tr><th>Товар</th><th>Продано (шт.)</th><th>Сумма продаж</th></tr></thead><tbody>';
+        let table = '<table class="data-table"><thead><tr><th>Товар</th><th>Продано (шт.)</th><th>Сумма продаж</th></tr></thead><tbody>';
         if (reportRes.length) {
             reportRes[0].values.forEach(row => {
                 table += `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2].toFixed(2)}</td></tr>`;
