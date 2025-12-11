@@ -99,38 +99,30 @@ export async function renderOrderDetails(db, router, orderId) {
                          </div>`;
     }
 
-    let surveyHtml = `<div id="survey-section" class="page-section"><h3>Анкета курьера</h3>`;
-    const surveyRes = db.exec(`SELECT photo_url, stock_check_notes, layout_notes, other_notes, timestamp FROM delivery_surveys WHERE order_id = ${orderId}`);
-    const surveyExists = surveyRes.length > 0;
+    let surveyHtml = '';
+    // Анкета курьера должна показываться только если статус заказа "Доставлен"
+    if (o_status === 'Доставлен') {
+        const surveyRes = db.exec(`SELECT photo_url, stock_check_notes, layout_notes, other_notes, timestamp FROM delivery_surveys WHERE order_id = ${orderId}`);
+        const surveyExists = surveyRes.length > 0;
 
-    if (surveyExists) {
-        const survey = surveyRes[0].values[0];
-        // Используем Base64 напрямую в src
-        surveyHtml += `<div class="survey-display">
-                        <div class="survey-item"><strong>Фото-подтверждение:</strong> ${survey[0] ? `<a href="${survey[0]}" target="_blank"><img src="${survey[0]}" alt="Фото" class="survey-photo"></a>` : 'Нет'}</div>
-                        <div class="survey-item"><strong>Проверка остатков:</strong> <p>${survey[1] || 'Нет'}</p></div>
-                        <div class="survey-item"><strong>Выкладка:</strong> <p>${survey[2] || 'Нет'}</p></div>
-                        <div class="survey-item"><strong>Прочее:</strong> <p>${survey[3] || 'Нет'}</p></div>
-                        <p><em>Заполнено: ${survey[4]}</em></p>
-                     </div>`;
-    } else {
-        const isCourierAndReady = await isCourier() && o_status === 'Передан курьеру';
-        surveyHtml += `<form id="survey-form" class="add-form">
-                        <fieldset ${!isCourierAndReady ? 'disabled' : ''}>
-                            <div>
-                                <label for="photo-upload">Фото-подтверждение</label>
-                                <input type="file" name="photo" id="photo-upload" accept="image/*" required>
-                                <label for="photo-upload" class="custom-file-upload">Выберите файл...</label>
-                            </div>
-                            <div><label for="stock_notes">Заметки по остаткам:</label><textarea id="stock_notes" name="stock_notes" required></textarea></div>
-                            <div><label for="layout_notes">Заметки по выкладке:</label><textarea id="layout_notes" name="layout_notes" required></textarea></div>
-                            <div><label for="other_notes">Прочие заметки:</label><textarea id="other_notes" name="other_notes" required></textarea></div>
-                            <button type="submit">Отправить анкету</button>
-                        </fieldset>
-                        ${!isCourierAndReady ? '<p><em>Анкету можно заполнить, когда заказ передан курьеру.</em></p>' : ''}
-                     </form>`;
+        surveyHtml += `<div id="survey-section" class="page-section"><h3>Анкета курьера</h3>`;
+        if (surveyExists) {
+            const survey = surveyRes[0].values[0];
+            // Используем Base64 напрямую в src
+            surveyHtml += `<div class="survey-display">
+                            <div class="survey-item"><strong>Фото-подтверждение:</strong> ${survey[0] ? `<a href="${survey[0]}" target="_blank"><img src="${survey[0]}" alt="Фото" class="survey-photo"></a>` : 'Нет'}</div>
+                            <div class="survey-item"><strong>Проверка остатков:</strong> <p>${survey[1] || 'Нет'}</p></div>
+                            <div class="survey-item"><strong>Выкладка:</strong> <p>${survey[2] || 'Нет'}</p></div>
+                            <div class="survey-item"><strong>Прочее:</strong> <p>${survey[3] || 'Нет'}</p></div>
+                            <p><em>Заполнено: ${survey[4]}</em></p>
+                         </div>`;
+        } else {
+            // Если статус "Доставлен", но анкеты нет, это аномалия.
+            // В этом случае просто не показываем форму, так как она должна была быть заполнена ранее.
+            surveyHtml += `<p><em>Анкета для этого заказа не найдена, хотя статус "Доставлен".</em></p>`;
+        }
+        surveyHtml += `</div>`;
     }
-    surveyHtml += `</div>`;
 
     content.innerHTML = `<h2>Детали заказа #${o_id}</h2><div class="page-content">${detailsHtml}${statusFormHtml}${itemsHtml}${addItemFormHtml}${surveyHtml}</div>`;
 
@@ -159,32 +151,9 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
         invoiceWindow.focus();
         invoiceWindow.print();
     });
-
-    const surveyForm = document.getElementById('survey-form');
-    if (surveyForm) {
-        surveyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const photoFile = formData.get('photo');
-            let photoBase64 = null;
-
-            if (photoFile && photoFile.size > 0) {
-                try {
-                    photoBase64 = await readFileAsBase64(photoFile);
-                } catch (error) {
-                    console.error("Ошибка чтения файла:", error);
-                    alert("Не удалось прочитать файл изображения.");
-                    return;
-                }
-            }
-            
-            db.run("INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [
-                orderId, photoBase64, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
-            ]);
-            renderOrderDetails(db, router, orderId);
-        });
-    }
     
+    // Удален обработчик для survey-form, так как форма для заполнения анкеты теперь только в модальном окне.
+
     const updateStatusForm = document.getElementById('update-status-form');
     if (updateStatusForm) {
         updateStatusForm.addEventListener('submit', async (e) => {
