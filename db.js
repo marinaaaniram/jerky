@@ -1,6 +1,8 @@
 // js/db.js
 import { populateDbWithFakeData } from './populate_db.js';
 
+const DB_KEY = 'jerky_app_db';
+
 function populate(db) {
     // --- Table Definitions ---
     db.run(`CREATE TABLE customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, address TEXT, phone TEXT, payment_type TEXT DEFAULT 'прямые', debt REAL DEFAULT 0, is_archived INTEGER DEFAULT 0);`);
@@ -34,17 +36,41 @@ function populate(db) {
     db.run("INSERT INTO price_rules (customer_id, product_id, special_price) VALUES (2, 1, 9.50)");
 }
 
+export function saveDatabase(db) {
+    const data = db.export();
+    const buffer = new Uint8Array(data);
+    const base64 = btoa(String.fromCharCode.apply(null, buffer));
+    localStorage.setItem(DB_KEY, base64);
+    console.log("Database saved to localStorage.");
+}
 
 export async function initDatabase() {
     const SQL = await initSqlJs({
         locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
     });
-    const db = new SQL.Database();
-    // Check if db is empty
-    const tables = db.exec("SELECT name FROM sqlite_master WHERE type='table'");
-    if (tables.length === 0) {
+
+    let db;
+    const storedData = localStorage.getItem(DB_KEY);
+
+    if (storedData) {
+        try {
+            const buffer = Uint8Array.from(atob(storedData), c => c.charCodeAt(0));
+            db = new SQL.Database(buffer);
+            console.log("Database loaded from localStorage.");
+        } catch (e) {
+            console.error("Failed to load database from localStorage, creating new one:", e);
+            db = new SQL.Database();
+            populate(db);
+            populateDbWithFakeData(db);
+            saveDatabase(db); // Save the newly populated database
+        }
+    } else {
+        console.log("No database found in localStorage, creating new one.");
+        db = new SQL.Database();
         populate(db);
         populateDbWithFakeData(db);
+        saveDatabase(db); // Save the newly populated database
     }
+
     return db;
 }

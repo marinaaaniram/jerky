@@ -1,5 +1,6 @@
 // js/views/orders.js
 import { canManageStock } from '../auth.js';
+import { saveDatabase } from '../db.js'; // Импортируем saveDatabase
 
 let showArchived = false;
 
@@ -55,6 +56,7 @@ export async function renderOrders(db, router) {
             e.preventDefault();
             const formData = new FormData(e.target);
             db.run("INSERT INTO orders (customer_id, order_date, status) VALUES (?, ?, 'Новый')", [formData.get('customer_id'), formData.get('order_date')]);
+            saveDatabase(db); // Сохраняем базу данных после добавления нового заказа
             renderOrders(db, router); // Re-render for instant update
         });
     }

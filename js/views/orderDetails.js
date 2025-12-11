@@ -1,5 +1,6 @@
 // js/views/orderDetails.js
 import { canChangeStatus, canManageStock, isCourier } from '../auth.js';
+import { saveDatabase } from '../db.js'; // Импортируем saveDatabase
 
 // Вспомогательная функция для применения действий при доставке
 async function applyDeliveryActions(db, orderId, c_id, total) {
@@ -7,6 +8,7 @@ async function applyDeliveryActions(db, orderId, c_id, total) {
     const customerRes = db.exec(`SELECT payment_type FROM customers WHERE id = ${c_id}`);
     if (customerRes.length && customerRes[0].values[0][0] === 'реализация') {
         db.run(`UPDATE customers SET debt = debt + ? WHERE id = ?`, [total, c_id]);
+        saveDatabase(db); // Сохраняем БД после обновления долга
     }
     const orderItems = db.exec(`SELECT product_id, quantity FROM order_items WHERE order_id = ${orderId}`);
     if (orderItems.length) {
@@ -14,6 +16,7 @@ async function applyDeliveryActions(db, orderId, c_id, total) {
             const [productId, quantity] = item;
             db.run("UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?", [quantity, productId]);
             db.run("INSERT INTO stock_movements (product_id, quantity_change, reason, movement_date) VALUES (?, ?, 'продажа', ?)", [productId, -quantity, new Date().toISOString().slice(0, 10)]);
+            saveDatabase(db); // Сохраняем БД после каждого изменения запасов и движения
         });
     }
 }
@@ -196,6 +199,7 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             // Обновляем статус заказа в базе данных
             console.log(`[Order ${orderId}] Обновляем статус на: ${newStatus}`);
             db.run("UPDATE orders SET status = ? WHERE id = ?", [newStatus, orderId]);
+            saveDatabase(db); // Сохраняем БД после обновления статуса заказа
             renderOrderDetails(db, router, orderId);
         });
     }
@@ -227,6 +231,7 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             db.run("INSERT INTO delivery_surveys (order_id, photo_url, stock_check_notes, layout_notes, other_notes, timestamp) VALUES (?, ?, ?, ?, ?, ?)", [
                 orderId, photoBase64, formData.get('stock_notes'), formData.get('layout_notes'), formData.get('other_notes'), new Date().toLocaleString()
             ]);
+            saveDatabase(db); // Сохраняем БД после сохранения анкеты
             console.log(`[Order ${orderId}] Анкета сохранена.`);
 
             // Применяем действия по доставке
@@ -235,6 +240,7 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
 
             // Обновляем статус заказа на "Доставлен"
             db.run("UPDATE orders SET status = ? WHERE id = ?", ['Доставлен', orderId]);
+            saveDatabase(db); // Сохраняем БД после обновления статуса заказа на "Доставлен"
             console.log(`[Order ${orderId}] Статус заказа обновлен на "Доставлен".`);
 
             // Скрываем модальное окно и перерисовываем страницу
@@ -275,6 +281,7 @@ function attachEventListeners(db, router, { orderId, o_status, c_id, total }) {
             }
             
             db.run("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)", [orderId, productId, quantity, price]);
+            saveDatabase(db); // Сохраняем БД после добавления товара в заказ
             renderOrderDetails(db, router, orderId);
         });
     }
