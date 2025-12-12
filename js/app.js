@@ -2,7 +2,7 @@
 import { getCurrentUser, setCurrentUser } from './auth.js';
 import { updateNavigation, updateUserInfo } from './ui.js';
 import { router } from './router.js';
-import { initDatabase } from '../db.js';
+import { initDatabase } from './db.js';
 
 let db;
 
