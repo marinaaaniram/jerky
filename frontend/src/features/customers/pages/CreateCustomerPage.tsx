@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Container, Title, Group } from '@mantine/core';
+import { Container, Title, Group, Button } from '@mantine/core';
 import { useCreateCustomer } from '../hooks/useCustomers';
 import { CustomerForm } from '../components/CustomerForm';
 import type { PaymentType } from '../../../types';
@@ -19,20 +19,11 @@ export function CreateCustomerPage() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" mb="xl">
-        <Title order={2}>Создать нового клиента</Title>
-        <button
-          onClick={() => navigate('/customers')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'inherit',
-            padding: 0,
-          }}
-        >
-          Отмена
-        </button>
+      <Group justify="flex-start" mb="xl" gap="xs">
+        <Button variant="subtle" onClick={() => navigate('/customers')}>
+          Назад
+        </Button>
+        <Title order={2} style={{ flexGrow: 1 }}>Создать нового клиента</Title>
       </Group>
 
       <CustomerForm

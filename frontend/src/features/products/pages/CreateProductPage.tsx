@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Container, Title, Group } from '@mantine/core';
+import { Container, Title, Group, Button } from '@mantine/core';
 import { useCreateProduct } from '../hooks/useProducts';
 import { ProductForm } from '../components/ProductForm';
 
@@ -18,20 +18,11 @@ export function CreateProductPage() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" mb="xl">
-        <Title order={2}>Создать новый товар</Title>
-        <button
-          onClick={() => navigate('/products')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'inherit',
-            padding: 0,
-          }}
-        >
-          Отмена
-        </button>
+      <Group justify="flex-start" mb="xl" gap="xs">
+        <Button variant="subtle" onClick={() => navigate('/products')}>
+          Назад
+        </Button>
+        <Title order={2} style={{ flexGrow: 1 }}>Создать новый товар</Title>
       </Group>
 
       <ProductForm

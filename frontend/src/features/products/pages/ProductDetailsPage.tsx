@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Title, Group, LoadingOverlay, Text } from '@mantine/core';
+import { Container, Title, Group, LoadingOverlay, Text, Button } from '@mantine/core';
 import { useProduct, useUpdateProduct } from '../hooks/useProducts';
 import { ProductForm } from '../components/ProductForm';
 
@@ -33,20 +33,11 @@ export function ProductDetailsPage() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" mb="xl">
-        <Title order={2}>{product?.name || 'Загрузка...'}</Title>
-        <button
-          onClick={() => navigate('/products')}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'inherit',
-            padding: 0,
-          }}
-        >
+      <Group justify="flex-start" mb="xl" gap="xs">
+        <Button variant="subtle" onClick={() => navigate('/products')}>
           Назад
-        </button>
+        </Button>
+        <Title order={2} style={{ flexGrow: 1 }}>{product?.name || 'Загрузка...'}</Title>
       </Group>
 
       <div style={{ position: 'relative' }}>

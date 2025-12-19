@@ -109,7 +109,7 @@ export function CustomersPage() {
 
       <Modal opened={showArchiveModal} onClose={() => setShowArchiveModal(false)} title="Подтверждение">
         <Text mb="lg">Вы уверены, что хотите архивировать этого клиента?</Text>
-        <Group justify="flex-end">
+        <Group justify="flex-start">
           <Button variant="subtle" onClick={() => setShowArchiveModal(false)}>
             Отмена
           </Button>

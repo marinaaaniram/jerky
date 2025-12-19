@@ -94,11 +94,11 @@ export function OrderDetailsPage() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" mb="xl">
-        <Title order={2}>Заказ №{order.id}</Title>
+      <Group justify="flex-start" mb="xl" gap="xs">
         <Button variant="subtle" onClick={() => navigate('/orders')}>
           Назад к списку
         </Button>
+        <Title order={2} style={{ flexGrow: 1 }}>Заказ №{order.id}</Title>
       </Group>
 
       <Grid mb="xl">

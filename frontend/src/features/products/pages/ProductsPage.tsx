@@ -91,7 +91,7 @@ export function ProductsPage() {
 
       <Modal opened={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Подтверждение">
         <Text mb="lg">Вы уверены, что хотите удалить этот товар?</Text>
-        <Group justify="flex-end">
+        <Group justify="flex-start">
           <Button variant="subtle" onClick={() => setShowDeleteModal(false)}>
             Отмена
           </Button>

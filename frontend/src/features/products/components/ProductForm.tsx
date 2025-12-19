@@ -82,7 +82,7 @@ export function ProductForm({
           disabled={isLoading}
         />
 
-        <Group justify="flex-end" mt="md">
+        <Group justify="flex-start" mt="md">
           <Button variant="subtle" onClick={onCancel} disabled={isLoading}>
             Отмена
           </Button>

@@ -61,11 +61,11 @@ export function CreateOrderPage() {
 
   return (
     <Container size="xl">
-      <Group justify="space-between" mb="xl">
-        <Title order={2}>Создать новый заказ</Title>
+      <Group justify="flex-start" mb="xl" gap="xs">
         <Button variant="subtle" onClick={() => navigate('/orders')}>
-          Отмена
+          Назад
         </Button>
+        <Title order={2} style={{ flexGrow: 1 }}>Создать новый заказ</Title>
       </Group>
 
       <Card shadow="sm" padding="lg">
@@ -89,7 +89,7 @@ export function CreateOrderPage() {
             minRows={3}
           />
 
-          <Group justify="flex-end" mt="md">
+          <Group justify="flex-start" mt="md">
             <Button variant="subtle" onClick={() => navigate('/orders')}>
               Отмена
             </Button>
