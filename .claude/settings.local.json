@@ -20,7 +20,14 @@
       "Bash(/tmp/test_all_orders.sh)",
       "Bash(docker-compose logs:*)",
       "Bash(/tmp/create_test_orders.sh)",
-      "Bash(/tmp/test_frontend_data.sh)"
+      "Bash(/tmp/test_frontend_data.sh)",
+      "Bash(tree:*)",
+      "Bash(bash:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd comprehensive testing infrastructure for Docker-based development\n\n## Features\n- Created `tests/` directory with organized test structure\n- Added bash utility functions for authentication and API testing\n- Created reusable helper functions with colored output formatting\n- Implemented decimal price bug test (✓ VERIFIED FIX)\n- Implemented order management feature test (✓ VERIFIED WORKS)\n- Added 20+ API request examples with documentation\n\n## Testing Files\n- tests/QUICK_TEST.sh - Run all tests in one command\n- tests/README.md - Comprehensive 150+ line testing guide\n- tests/utils/auth.sh - Authentication helpers (4 functions)\n- tests/utils/helpers.sh - 20+ test utility functions\n- tests/bugs/decimal-price-bug.sh - Decimal type transformation test\n- tests/features/order-management.sh - Order CRUD operations test\n- tests/data/api-examples.sh - Common API request patterns\n\n## Documentation\n- Updated CLAUDE.md with Docker testing section\n- Created TESTING_GUIDE.md quick reference\n- Full examples and best practices included\n\n## Testing Results\n✅ All tests PASSED\n✓ Decimal prices now come as numbers (not strings)\n✓ Order management operations work correctly\n✓ Ready for continuous development\n\n🧪 Generated with Claude Code\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(npx playwright:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

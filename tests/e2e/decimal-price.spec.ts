@@ -19,15 +19,8 @@ test.describe('Decimal Price Bug Fix - UI Tests', () => {
   });
 
   test('should display order items table without errors', async ({ page }) => {
-    // Идём на страницу заказов
-    await goToOrders(page);
-    await waitForPageReady(page);
-
-    // Ищем первый заказ и открываем подробности
-    const firstOrderLink = page.locator('a:has-text("1")').first();
-    await firstOrderLink.click();
-
-    // Ждём загрузки страницы
+    // Идём напрямую на первый заказ
+    await page.goto('/orders/1');
     await page.waitForURL('/orders/1', { timeout: 10000 });
     await waitForPageReady(page);
 
@@ -39,15 +32,8 @@ test.describe('Decimal Price Bug Fix - UI Tests', () => {
   });
 
   test('should display all prices as valid numbers', async ({ page }) => {
-    // Открываем заказ #2 (тот, что был с ошибкой)
-    await goToOrders(page);
-    await waitForPageReady(page);
-
-    // Ищем заказ #2
-    const order2 = page.locator('tr').filter({ hasText: '2' }).first();
-    const detailsButton = order2.locator('button:has-text("Подробнее")');
-    await detailsButton.click();
-
+    // Открываем заказ #2 (тот, что был с ошибкой) напрямую
+    await page.goto('/orders/2');
     await page.waitForURL('/orders/2', { timeout: 10000 });
     await waitForPageReady(page);
 
@@ -66,13 +52,8 @@ test.describe('Decimal Price Bug Fix - UI Tests', () => {
   });
 
   test('should calculate and display order total correctly', async ({ page }) => {
-    // Открываем заказ
-    await goToOrders(page);
-    await waitForPageReady(page);
-
-    const firstOrderLink = page.locator('a:has-text("1")').first();
-    await firstOrderLink.click();
-
+    // Открываем заказ напрямую
+    await page.goto('/orders/1');
     await page.waitForURL('/orders/1', { timeout: 10000 });
     await waitForPageReady(page);
 
@@ -112,13 +93,8 @@ test.describe('Decimal Price Bug Fix - UI Tests', () => {
       }
     });
 
-    // Открываем заказ
-    await goToOrders(page);
-    await waitForPageReady(page);
-
-    const firstOrderLink = page.locator('a:has-text("1")').first();
-    await firstOrderLink.click();
-
+    // Открываем заказ напрямую
+    await page.goto('/orders/1');
     await page.waitForURL('/orders/1', { timeout: 10000 });
     await waitForPageReady(page);
 
@@ -132,30 +108,8 @@ test.describe('Decimal Price Bug Fix - UI Tests', () => {
 
   test('should work with order that previously had the bug', async ({ page }) => {
     // Этот тест проверяет конкретно заказ #2, который был с ошибкой
-    await goToOrders(page);
-    await waitForPageReady(page);
-
-    // Ищем и открываем заказ #2
-    const orderRows = page.locator('tbody tr');
-    let found = false;
-
-    for (let i = 0; i < (await orderRows.count()); i++) {
-      const row = orderRows.nth(i);
-      const text = await row.textContent();
-
-      if (text && text.includes('2')) {
-        const detailsButton = row.locator('button:has-text("Подробнее")');
-        await detailsButton.click();
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      test.skip();
-      return;
-    }
-
+    // Открываем заказ #2 напрямую
+    await page.goto('/orders/2');
     await page.waitForURL('/orders/2', { timeout: 10000 });
     await waitForPageReady(page);
 
@@ -177,12 +131,8 @@ test.describe('Decimal Price Bug Fix - UI Tests', () => {
   });
 
   test('should display prices in correct format with currency', async ({ page }) => {
-    await goToOrders(page);
-    await waitForPageReady(page);
-
-    const firstOrderLink = page.locator('a:has-text("1")').first();
-    await firstOrderLink.click();
-
+    // Открываем заказ напрямую
+    await page.goto('/orders/1');
     await page.waitForURL('/orders/1', { timeout: 10000 });
     await waitForPageReady(page);
 
