@@ -21,7 +21,7 @@ import { AddItemModal } from '../components/AddItemModal';
 import { DeliverySurveyModal } from '../components/DeliverySurveyModal';
 
 const statusColors: Record<string, string> = {
-  [OrderStatus.NEW]: 'blue',
+  [OrderStatus.NEW]: 'gray',
   [OrderStatus.ASSEMBLING]: 'yellow',
   [OrderStatus.TRANSFERRED]: 'orange',
   [OrderStatus.DELIVERED]: 'green',

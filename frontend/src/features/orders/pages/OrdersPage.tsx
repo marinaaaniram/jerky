@@ -1,10 +1,11 @@
 import { Container, Title, Table, Badge, Button, Group, LoadingOverlay, Text } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { useOrders } from '../hooks/useOrders';
 import { OrderStatus } from '../../../types';
 
 const statusColors: Record<string, string> = {
-  [OrderStatus.NEW]: 'blue',
+  [OrderStatus.NEW]: 'gray',
   [OrderStatus.ASSEMBLING]: 'yellow',
   [OrderStatus.TRANSFERRED]: 'orange',
   [OrderStatus.DELIVERED]: 'green',
@@ -13,6 +14,7 @@ const statusColors: Record<string, string> = {
 export function OrdersPage() {
   const navigate = useNavigate();
   const { data: orders, isLoading, error } = useOrders();
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
   if (error) {
     return (
@@ -22,6 +24,17 @@ export function OrdersPage() {
     );
   }
 
+  const filteredOrders = selectedStatus
+    ? orders?.filter((order) => order.status === selectedStatus)
+    : orders;
+
+  const statuses = [
+    OrderStatus.NEW,
+    OrderStatus.ASSEMBLING,
+    OrderStatus.TRANSFERRED,
+    OrderStatus.DELIVERED,
+  ];
+
   return (
     <Container size="xl">
       <Group justify="space-between" mb="xl">
@@ -29,10 +42,29 @@ export function OrdersPage() {
         <Button onClick={() => navigate('/orders/new')}>Создать заказ</Button>
       </Group>
 
+      <Group mb="lg">
+        <Button
+          variant={selectedStatus === null ? 'filled' : 'light'}
+          onClick={() => setSelectedStatus(null)}
+        >
+          Все
+        </Button>
+        {statuses.map((status) => (
+          <Button
+            key={status}
+            variant={selectedStatus === status ? 'filled' : 'light'}
+            color={statusColors[status]}
+            onClick={() => setSelectedStatus(status)}
+          >
+            {status}
+          </Button>
+        ))}
+      </Group>
+
       <div style={{ position: 'relative', minHeight: 200 }}>
         <LoadingOverlay visible={isLoading} />
 
-        {orders && orders.length > 0 ? (
+        {filteredOrders && filteredOrders.length > 0 ? (
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
@@ -45,7 +77,7 @@ export function OrdersPage() {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <Table.Tr key={order.id}>
                   <Table.Td>{order.id}</Table.Td>
                   <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
