@@ -3,6 +3,7 @@ import { AppShell, Burger, Group, Title, Button, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { GlobalSearch } from '../GlobalSearch';
 
 export function AppLayout() {
   const [opened, { toggle }] = useDisclosure();
@@ -26,6 +27,7 @@ export function AppLayout() {
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
             <Title order={3}>Jerky</Title>
           </Group>
+          <GlobalSearch />
           <Group>
             <Text size="sm">{user?.firstName} {user?.lastName}</Text>
             <Button variant="subtle" onClick={handleLogout}>

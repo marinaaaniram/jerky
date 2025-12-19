@@ -78,24 +78,35 @@ export function OrdersPage() {
             </Table.Thead>
             <Table.Tbody>
               {filteredOrders.map((order) => (
-                <Table.Tr key={order.id}>
-                  <Table.Td>{order.id}</Table.Td>
-                  <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
-                  <Table.Td>{order.customer.name}</Table.Td>
-                  <Table.Td>
-                    <Badge color={statusColors[order.status]}>{order.status}</Badge>
-                  </Table.Td>
-                  <Table.Td>{order.orderItems.length}</Table.Td>
-                  <Table.Td>
-                    <Button
-                      size="xs"
-                      variant="light"
-                      onClick={() => navigate(`/orders/${order.id}`)}
-                    >
-                      Подробнее
-                    </Button>
-                  </Table.Td>
-                </Table.Tr>
+                <div key={order.id}>
+                  <Table.Tr>
+                    <Table.Td>{order.id}</Table.Td>
+                    <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
+                    <Table.Td>
+                      <div>
+                        <div>{order.customer.name}</div>
+                        {order.notes && (
+                          <Text size="xs" c="dimmed" style={{ marginTop: 4 }}>
+                            📝 {order.notes}
+                          </Text>
+                        )}
+                      </div>
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge color={statusColors[order.status]}>{order.status}</Badge>
+                    </Table.Td>
+                    <Table.Td>{order.orderItems.length}</Table.Td>
+                    <Table.Td>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        onClick={() => navigate(`/orders/${order.id}`)}
+                      >
+                        Подробнее
+                      </Button>
+                    </Table.Td>
+                  </Table.Tr>
+                </div>
               ))}
             </Table.Tbody>
           </Table>
