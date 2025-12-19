@@ -1,4 +1,4 @@
-import { Container, Title, Table, Badge, Button, Group, LoadingOverlay, Text } from '@mantine/core';
+import { Container, Title, Table, Badge, Button, Group, LoadingOverlay, Text, Tooltip } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useOrders } from '../hooks/useOrders';
@@ -73,40 +73,41 @@ export function OrdersPage() {
                 <Table.Th>Клиент</Table.Th>
                 <Table.Th>Статус</Table.Th>
                 <Table.Th>Позиций</Table.Th>
+                <Table.Th>Примечания</Table.Th>
                 <Table.Th>Действия</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {filteredOrders.map((order) => (
-                <div key={order.id}>
-                  <Table.Tr>
-                    <Table.Td>{order.id}</Table.Td>
-                    <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
-                    <Table.Td>
-                      <div>
-                        <div>{order.customer.name}</div>
-                        {order.notes && (
-                          <Text size="xs" c="dimmed" style={{ marginTop: 4 }}>
-                            📝 {order.notes}
-                          </Text>
-                        )}
-                      </div>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge color={statusColors[order.status]}>{order.status}</Badge>
-                    </Table.Td>
-                    <Table.Td>{order.orderItems.length}</Table.Td>
-                    <Table.Td>
-                      <Button
-                        size="xs"
-                        variant="light"
-                        onClick={() => navigate(`/orders/${order.id}`)}
-                      >
-                        Подробнее
-                      </Button>
-                    </Table.Td>
-                  </Table.Tr>
-                </div>
+                <Table.Tr key={order.id}>
+                  <Table.Td>{order.id}</Table.Td>
+                  <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
+                  <Table.Td>{order.customer.name}</Table.Td>
+                  <Table.Td>
+                    <Badge color={statusColors[order.status]}>{order.status}</Badge>
+                  </Table.Td>
+                  <Table.Td>{order.orderItems.length}</Table.Td>
+                  <Table.Td>
+                    {order.notes ? (
+                      <Tooltip label={order.notes} multiline maw={300}>
+                        <Text size="sm" c="dimmed" lineClamp={1} style={{ cursor: 'help' }}>
+                          📝 {order.notes}
+                        </Text>
+                      </Tooltip>
+                    ) : (
+                      <Text size="sm" c="dimmed">—</Text>
+                    )}
+                  </Table.Td>
+                  <Table.Td>
+                    <Button
+                      size="xs"
+                      variant="light"
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                    >
+                      Подробнее
+                    </Button>
+                  </Table.Td>
+                </Table.Tr>
               ))}
             </Table.Tbody>
           </Table>
