@@ -7,6 +7,9 @@ import { DashboardPage } from './pages/DashboardPage';
 import { OrdersPage } from './features/orders/pages/OrdersPage';
 import { OrderDetailsPage } from './features/orders/pages/OrderDetailsPage';
 import { CreateOrderPage } from './features/orders/pages/CreateOrderPage';
+import { ProductsPage } from './features/products/pages/ProductsPage';
+import { CreateProductPage } from './features/products/pages/CreateProductPage';
+import { ProductDetailsPage } from './features/products/pages/ProductDetailsPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
@@ -48,8 +51,10 @@ function App() {
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/new" element={<CreateOrderPage />} />
               <Route path="/orders/:id" element={<OrderDetailsPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/products/new" element={<CreateProductPage />} />
+              <Route path="/products/:id" element={<ProductDetailsPage />} />
               <Route path="/customers" element={<div>Клиенты (в разработке)</div>} />
-              <Route path="/products" element={<div>Товары (в разработке)</div>} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
