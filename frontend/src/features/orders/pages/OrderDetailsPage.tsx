@@ -103,8 +103,8 @@ export function OrderDetailsPage() {
 
       <Grid mb="xl">
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg">
-            <Stack gap="md">
+          <Card shadow="sm" padding="lg" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <Stack gap="md" style={{ flex: 1 }}>
               <div>
                 <Text size="sm" c="dimmed">
                   Клиент
@@ -145,8 +145,8 @@ export function OrderDetailsPage() {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg">
-            <Stack gap="md">
+          <Card shadow="sm" padding="lg" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <Stack gap="md" style={{ flex: 1 }}>
               <div>
                 <Text size="sm" c="dimmed">
                   Адрес доставки
