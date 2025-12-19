@@ -1,6 +1,11 @@
 Всегда тестируй свои изменения. Тестируй через докер. 
 Но не удаляй и поднимай заново контейнеры, а сразу тестируй в поднятом контейнере
 
+- ❌ Без "Generated with Claude Code"
+- ❌ Без "Co-Authored-By: Claude"
+- ✅ Все коммиты только от marina
+- ✅ Правила проекта имеют приоритет
+
 ## Data & Privacy (mandatory)
 
 - Never read, request, infer, log, or reconstruct:
