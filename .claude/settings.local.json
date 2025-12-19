@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(docker-compose down:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(npm run migration:run:*)",
+      "Bash(npm run seed:run:*)",
+      "Bash(docker logs:*)",
+      "Bash(curl:*)",
+      "Bash(docker exec:*)",
+      "Bash(/tmp/test_create_order.sh)",
+      "Bash(chmod:*)",
+      "Bash(/tmp/test_add_item.sh)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

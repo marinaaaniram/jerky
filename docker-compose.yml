@@ -1,28 +1,68 @@
 version: '3.8'
 
 services:
-  server:
+  postgres:
+    image: postgres:15-alpine
+    container_name: jerky-postgres
+    environment:
+      POSTGRES_DB: jerky
+      POSTGRES_USER: jerky_user
+      POSTGRES_PASSWORD: jerky_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - jerky-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jerky_user -d jerky"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
+    container_name: jerky-backend
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: jerky
+      DATABASE_USER: jerky_user
+      DATABASE_PASSWORD: jerky_password
+      JWT_SECRET: your-secret-key-change-in-production
+      NODE_ENV: development
     ports:
       - "3000:3000"
-    volumes:
-      - ./server/jerky.db:/app/server/jerky.db # Для сохранения данных SQLite
-    networks:
-      - app-network
-
-  client:
-    build:
-      context: .
-      dockerfile: Dockerfile.client
-    ports:
-      - "80:80"
     depends_on:
-      - server
+      postgres:
+        condition: service_healthy
     networks:
-      - app-network
+      - jerky-network
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jerky-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - jerky-network
+    environment:
+      VITE_API_URL: http://localhost:3000
+    volumes:
+      - ./frontend/src:/app/src
+
+volumes:
+  postgres_data:
 
 networks:
-  app-network:
+  jerky-network:
     driver: bridge

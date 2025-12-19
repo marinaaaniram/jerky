@@ -1,0 +1,30 @@
+import { Repository, DataSource } from 'typeorm';
+import { Order } from './entities/order.entity';
+import { OrderItem } from './entities/order-item.entity';
+import { Customer } from '../customers/entities/customer.entity';
+import { Product } from '../products/entities/product.entity';
+import { PriceRule } from '../price-rules/entities/price-rule.entity';
+import { StockMovement } from '../stock-movements/entities/stock-movement.entity';
+import { DeliverySurvey } from '../delivery-surveys/entities/delivery-survey.entity';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { AddItemDto } from './dto/add-item.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
+export declare class OrdersService {
+    private ordersRepository;
+    private orderItemsRepository;
+    private customersRepository;
+    private productsRepository;
+    private priceRulesRepository;
+    private stockMovementsRepository;
+    private deliverySurveysRepository;
+    private dataSource;
+    constructor(ordersRepository: Repository<Order>, orderItemsRepository: Repository<OrderItem>, customersRepository: Repository<Customer>, productsRepository: Repository<Product>, priceRulesRepository: Repository<PriceRule>, stockMovementsRepository: Repository<StockMovement>, deliverySurveysRepository: Repository<DeliverySurvey>, dataSource: DataSource);
+    create(createOrderDto: CreateOrderDto): Promise<Order>;
+    findAll(): Promise<Order[]>;
+    findOne(id: number): Promise<Order>;
+    addItem(orderId: number, addItemDto: AddItemDto): Promise<OrderItem>;
+    updateStatus(orderId: number, updateStatusDto: UpdateStatusDto): Promise<Order>;
+    private deliverOrder;
+    getTotal(orderId: number): Promise<number>;
+    remove(id: number): Promise<void>;
+}
