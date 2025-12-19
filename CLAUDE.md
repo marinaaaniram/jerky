@@ -252,6 +252,149 @@ VITE_API_URL=http://localhost:3000
 - If `deliverOrder()` fails with "survey not found", must create survey first
 - Photo stored as base64 - use multi-part form with image upload in frontend
 
+## Testing with Docker
+
+All development and testing should be done through Docker. This ensures consistency and prevents port conflicts.
+
+### Start Fresh Docker Environment
+
+```bash
+# Stop and remove all containers + volumes
+docker-compose down -v
+
+# Rebuild and start
+docker-compose up --build -d
+
+# Wait for initialization (20 seconds)
+sleep 20
+
+# Check backend is running
+curl http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@test.com","password":"test"}'
+```
+
+### Testing Structure
+
+Tests are organized in `/tests` directory:
+
+```
+tests/
+├── README.md                          # Full testing guide
+├── utils/
+│   ├── auth.sh                        # Authentication helpers
+│   ├── helpers.sh                     # Common test functions
+│   └── setup.sh                       # Test setup utilities
+├── bugs/
+│   └── decimal-price-bug.sh          # Test for fixed bug
+└── features/
+    └── order-management.sh           # Feature test example
+```
+
+### Running Tests
+
+#### Test Bug Fix (Decimal Price Issue)
+
+```bash
+# Verify prices come as numbers, not strings
+bash tests/bugs/decimal-price-bug.sh
+```
+
+Expected output:
+```
+✅ All checks passed! Bug is FIXED
+Passed: 3 | Failed: 0
+```
+
+#### Test Feature (Order Management)
+
+```bash
+# Full test of order creation, items, status updates
+bash tests/features/order-management.sh
+```
+
+#### Quick API Testing
+
+```bash
+source tests/utils/auth.sh
+source tests/utils/helpers.sh
+
+TOKEN=$(get_token)
+print_heading "Testing Orders"
+
+# Get all orders
+API_GET "http://localhost:3000/api/orders" "$TOKEN"
+
+# Create order
+API_POST "http://localhost:3000/api/orders" "$TOKEN" '{"customerId": 1}'
+
+# Check prices are numbers
+curl -s http://localhost:3000/api/orders/2 \
+  -H "Authorization: Bearer $TOKEN" | \
+  jq '.orderItems[] | {price, isNumber: (.price | type == "number")}'
+```
+
+### Testing Workflow
+
+1. **Make code changes** in backend or frontend
+2. **Rebuild Docker** (changes auto-compile):
+   ```bash
+   docker-compose up --build -d
+   ```
+3. **Run relevant test**:
+   ```bash
+   # Bug test
+   bash tests/bugs/decimal-price-bug.sh
+
+   # Feature test
+   bash tests/features/order-management.sh
+   ```
+4. **Check frontend** at http://localhost:5173
+5. **If OK → commit**, if not → fix and re-test
+
+### Creating New Tests
+
+See `/tests/README.md` for complete guide on:
+- Adding bug tests
+- Adding feature tests
+- Using helper functions
+- Writing assertions
+- API examples
+
+Example simple test:
+
+```bash
+#!/bin/bash
+source ../utils/auth.sh
+source ../utils/helpers.sh
+
+print_heading "Testing: My Feature"
+TOKEN=$(get_token)
+
+API_GET "http://localhost:3000/api/orders" "$TOKEN"
+
+print_success "Test passed!"
+```
+
+### Debugging Tests
+
+```bash
+# Check Docker logs
+docker-compose logs backend -f
+
+# Check if containers are running
+docker-compose ps
+
+# Stop containers
+docker-compose down
+
+# Shell into backend
+docker exec -it jerky-backend sh
+
+# Query database
+docker exec jerky-postgres psql -U jerky_user -d jerky -c "SELECT * FROM orders;"
+```
+
 ## Useful File References
 
 **Backend Configuration**:
@@ -268,6 +411,12 @@ VITE_API_URL=http://localhost:3000
 - Docker compose: `docker-compose.yml`
 - Backend Dockerfile: `backend/Dockerfile`
 - Frontend Dockerfile: `frontend/Dockerfile`
+
+**Testing**:
+- Main test guide: `tests/README.md`
+- Auth utilities: `tests/utils/auth.sh`
+- Helper functions: `tests/utils/helpers.sh`
+- API examples: `tests/data/api-examples.sh`
 
 **Documentation**:
 - Main README: `README.md`
