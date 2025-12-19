@@ -12,6 +12,10 @@ export interface SearchResult {
   description: string;
   icon?: string;
   url: string;
+  // Additional fields for orders
+  status?: string;
+  customer?: string;
+  notes?: string;
 }
 
 @Injectable()
@@ -50,17 +54,16 @@ export class SearchService {
       });
 
       orders.forEach((order) => {
-        const description = order.notes
-          ? `${order.customer?.name || 'Неизвестный'} | ${order.status} | "${order.notes.substring(0, 40)}${order.notes.length > 40 ? '...' : ''}"`
-          : `Клиент: ${order.customer?.name || 'Неизвестный'} | Статус: ${order.status}`;
-
         results.push({
           type: 'order',
           id: order.id,
           title: `Заказ #${order.id}`,
-          description,
+          description: '', // Will be built on frontend
           icon: '📦',
           url: `/orders/${order.id}`,
+          status: order.status,
+          customer: order.customer?.name || 'Неизвестный',
+          notes: order.notes || undefined,
         });
       });
 

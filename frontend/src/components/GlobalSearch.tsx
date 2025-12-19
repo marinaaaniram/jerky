@@ -1,9 +1,16 @@
 import { useState, useCallback } from 'react';
-import { TextInput, Paper, Group, Text, ActionIcon, Loader, Stack, Badge } from '@mantine/core';
+import { TextInput, Paper, Group, Text, ActionIcon, Loader, Stack, Badge, Flex } from '@mantine/core';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { searchAPI, type SearchResult } from '../api/search';
 import styles from './GlobalSearch.module.css';
+
+const statusColors: Record<string, string> = {
+  'Новый': 'gray',
+  'В сборке': 'yellow',
+  'Передан курьеру': 'orange',
+  'Доставлен': 'green',
+};
 
 export function GlobalSearch() {
   const [query, setQuery] = useState('');
@@ -182,6 +189,66 @@ function SearchResultItem({ result, onClick }: SearchResultItemProps) {
     return colors[type];
   };
 
+  const getTypeLabel = (type: SearchResult['type']) => {
+    return type === 'order' ? 'Заказ' : type === 'customer' ? 'Клиент' : 'Товар';
+  };
+
+  // Special rendering for orders
+  if (result.type === 'order' && result.status) {
+    return (
+      <div
+        className={styles.resultItem}
+        onClick={onClick}
+        style={{
+          padding: '12px',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          transition: 'background-color 0.15s ease',
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLElement).style.backgroundColor = '#f5f5f5';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+        }}
+      >
+        <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1, minWidth: 0 }}>
+            <Text size="lg">{result.icon}</Text>
+            <Text size="sm" fw={500}>
+              {result.title}
+            </Text>
+          </div>
+
+          <Flex direction="column" align="flex-end" gap={4}>
+            <Badge
+              size="sm"
+              color={statusColors[result.status] || 'gray'}
+              variant="filled"
+            >
+              {result.status}
+            </Badge>
+          </Flex>
+        </Group>
+
+        <Flex gap="xs" wrap="wrap" style={{ marginTop: '6px', marginLeft: '26px' }}>
+          {result.customer && (
+            <Text size="xs" c="dimmed">
+              👤 {result.customer}
+            </Text>
+          )}
+          {result.notes && (
+            <Text size="xs" c="dimmed" lineClamp={1}>
+              📝 {result.notes.substring(0, 50)}
+              {result.notes.length > 50 ? '...' : ''}
+            </Text>
+          )}
+        </Flex>
+      </div>
+    );
+  }
+
+  // Default rendering for other types
   return (
     <div
       className={styles.resultItem}
@@ -218,7 +285,7 @@ function SearchResultItem({ result, onClick }: SearchResultItemProps) {
           color={getTypeColor(result.type)}
           style={{ whiteSpace: 'nowrap' }}
         >
-          {result.type === 'order' ? 'Заказ' : result.type === 'customer' ? 'Клиент' : 'Товар'}
+          {getTypeLabel(result.type)}
         </Badge>
       </Group>
     </div>

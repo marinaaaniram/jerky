@@ -53,7 +53,8 @@
       "Bash(docker-compose restart:*)"
     ],
     "deny": [
-      "Bash(docker-compose down -v*)"
+      "Bash(docker-compose down -v*)",
+      "Bash(git*)"
     ],
     "ask": []
   }

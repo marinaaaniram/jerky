@@ -7,6 +7,10 @@ export interface SearchResult {
   description: string;
   icon?: string;
   url: string;
+  // Additional fields for orders
+  status?: string;
+  customer?: string;
+  notes?: string;
 }
 
 export const searchAPI = {
