@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Title, Group, LoadingOverlay, Text, Button } from '@mantine/core';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { useCustomer, useUpdateCustomer } from '../hooks/useCustomers';
 import { CustomerForm } from '../components/CustomerForm';
 import type { PaymentType } from '../../../types';
@@ -35,7 +36,7 @@ export function CustomerDetailsPage() {
   return (
     <Container size="xl">
       <Group justify="flex-start" mb="xl" gap="xs">
-        <Button variant="subtle" onClick={() => navigate('/customers')}>
+        <Button variant="subtle" onClick={() => navigate('/customers')} leftSection={<IconArrowLeft size={18} />}>
           Назад
         </Button>
         <Title order={2} style={{ flexGrow: 1 }}>{customer?.name || 'Загрузка...'}</Title>

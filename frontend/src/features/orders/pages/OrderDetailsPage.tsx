@@ -13,6 +13,8 @@ import {
   Select,
   Grid,
 } from '@mantine/core';
+import { IconArrowLeft } from '@tabler/icons-react';
+import { notifications } from '@mantine/notifications';
 import { useOrder, useUpdateOrderStatus, useOrderTotal } from '../hooks/useOrders';
 import { useAuthStore } from '../../../store/authStore';
 import { OrderStatus } from '../../../types';
@@ -52,7 +54,7 @@ export function OrderDetailsPage() {
     return (
       <Container>
         <Text c="red">Ошибка загрузки заказа: {(error as Error).message}</Text>
-        <Button onClick={() => navigate('/orders')} mt="md">
+        <Button onClick={() => navigate('/orders')} mt="md" leftSection={<IconArrowLeft size={18} />}>
           Назад к списку
         </Button>
       </Container>
@@ -69,9 +71,20 @@ export function OrderDetailsPage() {
 
   const isDelivered = order.status === OrderStatus.DELIVERED;
   const canEdit = !isDelivered;
+  const hasItems = order.orderItems && order.orderItems.length > 0;
 
   const handleStatusChange = (newStatus: string | null) => {
     if (!newStatus) return;
+
+    // Check if order has items
+    if (!hasItems) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Добавьте хотя бы одну позицию перед изменением статуса',
+        color: 'red',
+      });
+      return;
+    }
 
     // If changing to DELIVERED, require delivery survey
     if (newStatus === OrderStatus.DELIVERED && !order.deliverySurvey) {
@@ -95,7 +108,7 @@ export function OrderDetailsPage() {
   return (
     <Container size="xl">
       <Group justify="flex-start" mb="xl" gap="xs">
-        <Button variant="subtle" onClick={() => navigate('/orders')}>
+        <Button variant="subtle" onClick={() => navigate('/orders')} leftSection={<IconArrowLeft size={18} />}>
           Назад к списку
         </Button>
         <Title order={2} style={{ flexGrow: 1 }}>Заказ №{order.id}</Title>
