@@ -6,6 +6,7 @@ const users_seeder_1 = require("./users.seeder");
 const customers_seeder_1 = require("./customers.seeder");
 const products_seeder_1 = require("./products.seeder");
 const price_rules_seeder_1 = require("./price-rules.seeder");
+const orders_seeder_1 = require("./orders.seeder");
 async function runSeeders() {
     try {
         console.log('🌱 Starting database seeding...\n');
@@ -16,6 +17,7 @@ async function runSeeders() {
         await (0, customers_seeder_1.seedCustomers)(data_source_1.AppDataSource);
         await (0, products_seeder_1.seedProducts)(data_source_1.AppDataSource);
         await (0, price_rules_seeder_1.seedPriceRules)(data_source_1.AppDataSource);
+        await (0, orders_seeder_1.seedOrders)(data_source_1.AppDataSource);
         console.log('\n🎉 All seeders completed successfully!');
         process.exit(0);
     }

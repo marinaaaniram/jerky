@@ -61,7 +61,16 @@ __decorate([
     __metadata("design:type", String)
 ], Customer.prototype, "paymentType", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2, default: 0 }),
+    (0, typeorm_1.Column)({
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        default: 0,
+        transformer: {
+            to: (value) => value,
+            from: (value) => parseFloat(String(value)),
+        },
+    }),
     __metadata("design:type", Number)
 ], Customer.prototype, "debt", void 0);
 __decorate([

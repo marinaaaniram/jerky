@@ -35,7 +35,15 @@ __decorate([
     __metadata("design:type", String)
 ], Product.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2 }),
+    (0, typeorm_1.Column)({
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        transformer: {
+            to: (value) => value,
+            from: (value) => parseFloat(String(value)),
+        },
+    }),
     __metadata("design:type", Number)
 ], Product.prototype, "price", void 0);
 __decorate([

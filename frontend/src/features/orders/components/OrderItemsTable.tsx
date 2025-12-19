@@ -10,7 +10,7 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
     return <Text c="dimmed">Товаров в заказе пока нет</Text>;
   }
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
   return (
     <Table striped>
@@ -23,14 +23,17 @@ export function OrderItemsTable({ items }: OrderItemsTableProps) {
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
-        {items.map((item) => (
-          <Table.Tr key={item.id}>
-            <Table.Td>{item.product.name}</Table.Td>
-            <Table.Td>{item.price.toFixed(2)} ₽</Table.Td>
-            <Table.Td>{item.quantity}</Table.Td>
-            <Table.Td>{(item.price * item.quantity).toFixed(2)} ₽</Table.Td>
-          </Table.Tr>
-        ))}
+        {items.map((item) => {
+          const price = Number(item.price);
+          return (
+            <Table.Tr key={item.id}>
+              <Table.Td>{item.product.name}</Table.Td>
+              <Table.Td>{price.toFixed(2)} ₽</Table.Td>
+              <Table.Td>{item.quantity}</Table.Td>
+              <Table.Td>{(price * item.quantity).toFixed(2)} ₽</Table.Td>
+            </Table.Tr>
+          );
+        })}
         <Table.Tr>
           <Table.Td colSpan={3} style={{ textAlign: 'right' }}>
             <Text fw={700}>Итого:</Text>

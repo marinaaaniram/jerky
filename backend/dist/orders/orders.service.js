@@ -51,6 +51,7 @@ let OrdersService = class OrdersService {
         }
         const order = this.ordersRepository.create({
             customerId: createOrderDto.customerId,
+            orderDate: new Date(),
             status: order_entity_1.OrderStatus.NEW,
             notes: createOrderDto.notes,
         });

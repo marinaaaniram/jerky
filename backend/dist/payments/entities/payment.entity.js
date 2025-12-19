@@ -35,7 +35,15 @@ __decorate([
     __metadata("design:type", customer_entity_1.Customer)
 ], Payment.prototype, "customer", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'decimal', precision: 10, scale: 2 }),
+    (0, typeorm_1.Column)({
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        transformer: {
+            to: (value) => value,
+            from: (value) => parseFloat(String(value)),
+        },
+    }),
     __metadata("design:type", Number)
 ], Payment.prototype, "amount", void 0);
 __decorate([

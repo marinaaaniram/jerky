@@ -14,7 +14,15 @@ export class Payment {
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string | number) => parseFloat(String(value)),
+    },
+  })
   amount: number;
 
   @Column({ name: 'payment_date', type: 'date' })

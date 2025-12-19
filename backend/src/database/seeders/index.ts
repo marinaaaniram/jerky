@@ -4,6 +4,7 @@ import { seedUsers } from './users.seeder';
 import { seedCustomers } from './customers.seeder';
 import { seedProducts } from './products.seeder';
 import { seedPriceRules } from './price-rules.seeder';
+import { seedOrders } from './orders.seeder';
 
 async function runSeeders() {
   try {
@@ -17,6 +18,7 @@ async function runSeeders() {
     await seedCustomers(AppDataSource);
     await seedProducts(AppDataSource);
     await seedPriceRules(AppDataSource);
+    await seedOrders(AppDataSource);
 
     console.log('\n🎉 All seeders completed successfully!');
     process.exit(0);

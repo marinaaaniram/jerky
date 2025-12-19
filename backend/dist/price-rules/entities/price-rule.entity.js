@@ -47,7 +47,16 @@ __decorate([
     __metadata("design:type", product_entity_1.Product)
 ], PriceRule.prototype, "product", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'special_price', type: 'decimal', precision: 10, scale: 2 }),
+    (0, typeorm_1.Column)({
+        name: 'special_price',
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        transformer: {
+            to: (value) => value,
+            from: (value) => parseFloat(String(value)),
+        },
+    }),
     __metadata("design:type", Number)
 ], PriceRule.prototype, "specialPrice", void 0);
 __decorate([

@@ -32,7 +32,16 @@ export class Customer {
   })
   paymentType: PaymentType;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    default: 0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string | number) => parseFloat(String(value)),
+    },
+  })
   debt: number;
 
   @Column({ name: 'is_archived', default: false })

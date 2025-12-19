@@ -9,7 +9,7 @@ exports.databaseConfig = {
     password: process.env.DATABASE_PASSWORD || 'jerky_password',
     database: process.env.DATABASE_NAME || 'jerky',
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    synchronize: false,
+    synchronize: process.env.NODE_ENV === 'development',
     logging: process.env.NODE_ENV === 'development',
 };
 //# sourceMappingURL=database.config.js.map

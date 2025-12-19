@@ -11,7 +11,15 @@ export class Product {
   @Column({ length: 200 })
   name: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string | number) => parseFloat(String(value)),
+    },
+  })
   price: number;
 
   @Column({ name: 'stock_quantity', type: 'int', default: 0 })

@@ -22,7 +22,16 @@ export class PriceRule {
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
-  @Column({ name: 'special_price', type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    name: 'special_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string | number) => parseFloat(String(value)),
+    },
+  })
   specialPrice: number;
 
   @CreateDateColumn({ name: 'created_at' })

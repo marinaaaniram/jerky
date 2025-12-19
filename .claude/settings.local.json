@@ -13,7 +13,14 @@
       "Bash(docker exec:*)",
       "Bash(/tmp/test_create_order.sh)",
       "Bash(chmod:*)",
-      "Bash(/tmp/test_add_item.sh)"
+      "Bash(/tmp/test_add_item.sh)",
+      "Bash(jq:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiaXZhbkBqZXJreS5jb20iLCJyb2xlIjoi0KDRg9C60L7QstC-0LTQuNGC0LXQu9GMIiwiaWF0IjoxNzY2MTQ0MjMxLCJleHAiOjE3NjY3NDkwMzF9.B7GK5FvkjqWuhQPjOH3oZH9MBuKNwL6eZ0JE70VaC6I\")",
+      "Bash(cat:*)",
+      "Bash(/tmp/test_all_orders.sh)",
+      "Bash(docker-compose logs:*)",
+      "Bash(/tmp/create_test_orders.sh)",
+      "Bash(/tmp/test_frontend_data.sh)"
     ],
     "deny": [],
     "ask": []

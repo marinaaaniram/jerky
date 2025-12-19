@@ -12,6 +12,7 @@ const typeorm_1 = require("@nestjs/typeorm");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const database_config_1 = require("./config/database.config");
+const database_init_service_1 = require("./database/database-init.service");
 const auth_module_1 = require("./auth/auth.module");
 const roles_module_1 = require("./roles/roles.module");
 const users_module_1 = require("./users/users.module");
@@ -41,7 +42,7 @@ exports.AppModule = AppModule = __decorate([
             delivery_surveys_module_1.DeliverySurveysModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [app_service_1.AppService, database_init_service_1.DatabaseInitService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
