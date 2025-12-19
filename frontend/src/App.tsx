@@ -10,6 +10,9 @@ import { CreateOrderPage } from './features/orders/pages/CreateOrderPage';
 import { ProductsPage } from './features/products/pages/ProductsPage';
 import { CreateProductPage } from './features/products/pages/CreateProductPage';
 import { ProductDetailsPage } from './features/products/pages/ProductDetailsPage';
+import { CustomersPage } from './features/customers/pages/CustomersPage';
+import { CreateCustomerPage } from './features/customers/pages/CreateCustomerPage';
+import { CustomerDetailsPage } from './features/customers/pages/CustomerDetailsPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
@@ -54,7 +57,9 @@ function App() {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/new" element={<CreateProductPage />} />
               <Route path="/products/:id" element={<ProductDetailsPage />} />
-              <Route path="/customers" element={<div>Клиенты (в разработке)</div>} />
+              <Route path="/customers" element={<CustomersPage />} />
+              <Route path="/customers/new" element={<CreateCustomerPage />} />
+              <Route path="/customers/:id" element={<CustomerDetailsPage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

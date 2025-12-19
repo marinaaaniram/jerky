@@ -1,4 +1,9 @@
 {
+  "attribution": {
+    "commit": "Generated",
+    "pr": ""
+  },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(npm create:*)",
@@ -34,7 +39,14 @@
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_wait_for",
       "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_console_messages"
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_network_requests",
+      "mcp__playwright__browser_evaluate",
+      "Bash(__NEW_LINE__ TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiaXZhbkBqZXJreS5jb20iLCJyb2xlIjoiкруководитель\", \"iat\":1766144231,\"exp\":1766749031}.B7GK5FvkjqWuhQPjOH3oZH9MBuKNwL6eZ0JE70VaC6I\"\n\ncurl -s \"http://localhost:3000/api/customers?includeArchived=true\" \\\n  -H \"Authorization: Bearer $TOKEN \")",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiaXZhbkBqZXJreS5jb20iLCJyb2xlIjoi0KDRg9C60L7QstC-0LTQuNGC0LXQu9GMIiwiaWF0IjoxNzY2MTQ5OTY5LCJleHAiOjE3NjY3NTQ3Njl9.tPkdWjhP9Pe_eYIVefZukykl2zEJe7bV4swywPzY4lQ\")",
+      "mcp__playwright__browser_run_code",
+      "mcp__playwright__browser_take_screenshot"
     ],
     "deny": [],
     "ask": []

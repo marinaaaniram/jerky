@@ -2,7 +2,7 @@
 - ❌ Без "Co-Authored-By: Claude"
 - ✅ Все коммиты только от текущего пользователя git
 - ✅ Правила проекта имеют приоритет
-- ✅ Testing through Docker only
+- ✅ Check and test through Docker only
 
 ## Data & Privacy (mandatory)
 
