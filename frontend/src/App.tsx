@@ -13,6 +13,7 @@ import { ProductDetailsPage } from './features/products/pages/ProductDetailsPage
 import { CustomersPage } from './features/customers/pages/CustomersPage';
 import { CreateCustomerPage } from './features/customers/pages/CreateCustomerPage';
 import { CustomerDetailsPage } from './features/customers/pages/CustomerDetailsPage';
+import { InventoryPage } from './features/inventory/pages/InventoryPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
@@ -57,6 +58,7 @@ function App() {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/new" element={<CreateProductPage />} />
               <Route path="/products/:id" element={<ProductDetailsPage />} />
+              <Route path="/inventory-check" element={<InventoryPage />} />
               <Route path="/customers" element={<CustomersPage />} />
               <Route path="/customers/new" element={<CreateCustomerPage />} />
               <Route path="/customers/:id" element={<CustomerDetailsPage />} />

@@ -89,6 +89,9 @@ export const MovementReason = {
   ARRIVAL: 'приход',
   SALE: 'продажа',
   WRITEOFF: 'списание',
+  INVENTORY: 'инвентаризация',
+  CORRECTION: 'коррекция',
+  ADJUSTMENT: 'уточнение',
 } as const;
 
 export type MovementReason = typeof MovementReason[keyof typeof MovementReason];
@@ -97,10 +100,15 @@ export interface StockMovement {
   id: number;
   productId: number;
   product: Product;
-  quantity: number;
+  quantityChange: number;
   reason: MovementReason;
-  notes?: string;
+  reasonText?: string;
   movementDate: Date;
+  userId?: number;
+  user?: User;
+  cancelledBy?: number;
+  cancelledByUser?: User;
+  isActive: boolean;
   created_at: Date;
 }
 
