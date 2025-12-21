@@ -21,13 +21,15 @@ const update_status_dto_1 = require("./dto/update-status.dto");
 const jwt_auth_guard_1 = require("../common/guards/jwt-auth.guard");
 const roles_guard_1 = require("../common/guards/roles.guard");
 const roles_decorator_1 = require("../common/decorators/roles.decorator");
+const current_user_decorator_1 = require("../common/decorators/current-user.decorator");
+const user_entity_1 = require("../users/entities/user.entity");
 let OrdersController = class OrdersController {
     ordersService;
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    async create(createOrderDto) {
-        return this.ordersService.create(createOrderDto);
+    async create(createOrderDto, user) {
+        return this.ordersService.create(createOrderDto, user.id);
     }
     async findAll() {
         return this.ordersService.findAll();
@@ -54,8 +56,10 @@ __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)('Руководитель', 'Кладовщик'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, current_user_decorator_1.CurrentUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
+    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto,
+        user_entity_1.User]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "create", null);
 __decorate([

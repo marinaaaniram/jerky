@@ -16,6 +16,7 @@ import { PriceRulesModule } from './price-rules/price-rules.module';
 import { DeliverySurveysModule } from './delivery-surveys/delivery-surveys.module';
 import { SearchModule } from './search/search.module';
 import { DocumentsModule } from './documents/documents.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DocumentsModule } from './documents/documents.module';
     DeliverySurveysModule,
     SearchModule,
     DocumentsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseInitService],

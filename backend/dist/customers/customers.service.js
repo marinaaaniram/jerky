@@ -17,10 +17,13 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const customer_entity_1 = require("./entities/customer.entity");
+const customer_interaction_service_1 = require("./services/customer-interaction.service");
 let CustomersService = class CustomersService {
     customersRepository;
-    constructor(customersRepository) {
+    interactionService;
+    constructor(customersRepository, interactionService) {
         this.customersRepository = customersRepository;
+        this.interactionService = interactionService;
     }
     async create(createCustomerDto) {
         const customer = this.customersRepository.create({
@@ -46,16 +49,37 @@ let CustomersService = class CustomersService {
         }
         return customer;
     }
-    async update(id, updateCustomerDto) {
-        const customer = await this.findOne(id);
+    async update(id, updateCustomerDto, userId) {
+        const oldCustomer = await this.findOne(id);
+        const changes = {};
+        for (const [key, newValue] of Object.entries(updateCustomerDto)) {
+            if (oldCustomer[key] !== newValue && newValue !== undefined) {
+                changes[key] = {
+                    old: oldCustomer[key],
+                    new: newValue,
+                };
+            }
+        }
         await this.customersRepository.update(id, updateCustomerDto);
-        return this.findOne(id);
+        const updatedCustomer = await this.findOne(id);
+        if (Object.keys(changes).length > 0) {
+            await this.interactionService.logCustomerDataUpdated(id, changes, userId);
+        }
+        return updatedCustomer;
     }
-    async archive(id) {
+    async archive(id, userId) {
         const customer = await this.findOne(id);
         customer.isArchived = true;
-        await this.customersRepository.save(customer);
-        return customer;
+        const archived = await this.customersRepository.save(customer);
+        await this.interactionService.logArchived(id, userId);
+        return archived;
+    }
+    async unarchive(id, userId) {
+        const customer = await this.findOne(id);
+        customer.isArchived = false;
+        const unarchived = await this.customersRepository.save(customer);
+        await this.interactionService.logUnarchived(id, userId);
+        return unarchived;
     }
     async updateDebt(id, amount) {
         const customer = await this.findOne(id);
@@ -68,6 +92,7 @@ exports.CustomersService = CustomersService;
 exports.CustomersService = CustomersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(customer_entity_1.Customer)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        customer_interaction_service_1.CustomerInteractionService])
 ], CustomersService);
 //# sourceMappingURL=customers.service.js.map

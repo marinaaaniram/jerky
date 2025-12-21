@@ -55,7 +55,11 @@
       "mcp__playwright__browser_close",
       "Bash(npx tsc:*)",
       "Bash(docker-compose build:*)",
-      "Bash(docker-compose exec:*)"
+      "Bash(docker-compose exec:*)",
+      "Bash(grep:*)",
+      "Bash(TOKEN='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiaXZhbkBqZXJreS5jb20iLCJyb2xlIjoi0KDRg9C60L7QstC-0LTQuNGC0LXQu9GMIiwiaWF0IjoxNzY2MTQ5OTY5LCJleHAiOjE3NjY3NTQ3Njl9.tPkdWjhP9Pe_eYIVefZukykl2zEJe7bV4swywPzY4lQ')",
+      "Bash(pkill:*)",
+      "Bash(__NEW_LINE__ curl -s http://localhost:3000/api/analytics/sales )"
     ],
     "deny": [
       "Bash(docker-compose down -v:*)",

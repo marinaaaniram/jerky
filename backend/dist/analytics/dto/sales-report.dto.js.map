@@ -1,0 +1,1 @@
+{"version":3,"file":"sales-report.dto.js","sourceRoot":"","sources":["../../../src/analytics/dto/sales-report.dto.ts"],"names":[],"mappings":";;;AAAA,MAAa,cAAc;IACzB,MAAM,CAAS;IACf,OAAO,CAAS;IAChB,UAAU,CAAS;IACnB,YAAY,CAAS;IACrB,eAAe,CAAS;CACzB;AAND,wCAMC;AAED,MAAa,cAAc;IACzB,IAAI,CAAmB;IACvB,YAAY,CAAS;IACrB,WAAW,CAAS;IACpB,iBAAiB,CAAS;IAC1B,UAAU,CAIR;CACH;AAVD,wCAUC"}

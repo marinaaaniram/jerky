@@ -25,6 +25,7 @@ const price_rules_module_1 = require("./price-rules/price-rules.module");
 const delivery_surveys_module_1 = require("./delivery-surveys/delivery-surveys.module");
 const search_module_1 = require("./search/search.module");
 const documents_module_1 = require("./documents/documents.module");
+const analytics_module_1 = require("./analytics/analytics.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +45,7 @@ exports.AppModule = AppModule = __decorate([
             delivery_surveys_module_1.DeliverySurveysModule,
             search_module_1.SearchModule,
             documents_module_1.DocumentsModule,
+            analytics_module_1.AnalyticsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, database_init_service_1.DatabaseInitService],

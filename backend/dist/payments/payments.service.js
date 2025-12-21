@@ -18,14 +18,17 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const payment_entity_1 = require("./entities/payment.entity");
 const customer_entity_1 = require("../customers/entities/customer.entity");
+const customer_interaction_service_1 = require("../customers/services/customer-interaction.service");
 let PaymentsService = class PaymentsService {
     paymentsRepository;
     customersRepository;
     dataSource;
-    constructor(paymentsRepository, customersRepository, dataSource) {
+    interactionService;
+    constructor(paymentsRepository, customersRepository, dataSource, interactionService) {
         this.paymentsRepository = paymentsRepository;
         this.customersRepository = customersRepository;
         this.dataSource = dataSource;
+        this.interactionService = interactionService;
     }
     async create(createPaymentDto) {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -47,6 +50,7 @@ let PaymentsService = class PaymentsService {
             customer.debt -= createPaymentDto.amount;
             await queryRunner.manager.save(customer);
             await queryRunner.commitTransaction();
+            await this.interactionService.logPaymentReceived(createPaymentDto.customerId, createPaymentDto.amount);
             return payment;
         }
         catch (error) {
@@ -85,6 +89,7 @@ exports.PaymentsService = PaymentsService = __decorate([
     __param(1, (0, typeorm_1.InjectRepository)(customer_entity_1.Customer)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.DataSource])
+        typeorm_2.DataSource,
+        customer_interaction_service_1.CustomerInteractionService])
 ], PaymentsService);
 //# sourceMappingURL=payments.service.js.map

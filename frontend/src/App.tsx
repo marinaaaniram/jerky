@@ -15,6 +15,11 @@ import { CustomersPage } from './features/customers/pages/CustomersPage';
 import { CreateCustomerPage } from './features/customers/pages/CreateCustomerPage';
 import { CustomerDetailsPage } from './features/customers/pages/CustomerDetailsPage';
 import { InventoryPage } from './features/inventory/pages/InventoryPage';
+import { SalesReportPage } from './features/analytics/pages/SalesReportPage';
+import { CustomerReportPage } from './features/analytics/pages/CustomerReportPage';
+import { ProductReportPage } from './features/analytics/pages/ProductReportPage';
+import { StockReportPage } from './features/analytics/pages/StockReportPage';
+import { OrderStatusReportPage } from './features/analytics/pages/OrderStatusReportPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
@@ -64,6 +69,11 @@ function App() {
               <Route path="/customers" element={<CustomersPage />} />
               <Route path="/customers/new" element={<CreateCustomerPage />} />
               <Route path="/customers/:id" element={<CustomerDetailsPage />} />
+              <Route path="/analytics/sales" element={<SalesReportPage />} />
+              <Route path="/analytics/customers" element={<CustomerReportPage />} />
+              <Route path="/analytics/products" element={<ProductReportPage />} />
+              <Route path="/analytics/stock" element={<StockReportPage />} />
+              <Route path="/analytics/orders" element={<OrderStatusReportPage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -23,6 +23,7 @@ const product_entity_1 = require("../products/entities/product.entity");
 const price_rule_entity_1 = require("../price-rules/entities/price-rule.entity");
 const stock_movement_entity_1 = require("../stock-movements/entities/stock-movement.entity");
 const delivery_survey_entity_1 = require("../delivery-surveys/entities/delivery-survey.entity");
+const customer_interaction_service_1 = require("../customers/services/customer-interaction.service");
 let OrdersService = class OrdersService {
     ordersRepository;
     orderItemsRepository;
@@ -32,7 +33,8 @@ let OrdersService = class OrdersService {
     stockMovementsRepository;
     deliverySurveysRepository;
     dataSource;
-    constructor(ordersRepository, orderItemsRepository, customersRepository, productsRepository, priceRulesRepository, stockMovementsRepository, deliverySurveysRepository, dataSource) {
+    interactionService;
+    constructor(ordersRepository, orderItemsRepository, customersRepository, productsRepository, priceRulesRepository, stockMovementsRepository, deliverySurveysRepository, dataSource, interactionService) {
         this.ordersRepository = ordersRepository;
         this.orderItemsRepository = orderItemsRepository;
         this.customersRepository = customersRepository;
@@ -41,8 +43,9 @@ let OrdersService = class OrdersService {
         this.stockMovementsRepository = stockMovementsRepository;
         this.deliverySurveysRepository = deliverySurveysRepository;
         this.dataSource = dataSource;
+        this.interactionService = interactionService;
     }
-    async create(createOrderDto) {
+    async create(createOrderDto, userId) {
         const customer = await this.customersRepository.findOne({
             where: { id: createOrderDto.customerId },
         });
@@ -51,11 +54,14 @@ let OrdersService = class OrdersService {
         }
         const order = this.ordersRepository.create({
             customerId: createOrderDto.customerId,
+            userId,
             orderDate: new Date(),
             status: order_entity_1.OrderStatus.NEW,
             notes: createOrderDto.notes,
         });
-        return this.ordersRepository.save(order);
+        const savedOrder = await this.ordersRepository.save(order);
+        await this.interactionService.logOrderCreated(createOrderDto.customerId, savedOrder.id, userId);
+        return savedOrder;
     }
     async findAll() {
         return this.ordersRepository.find({
@@ -163,6 +169,7 @@ let OrdersService = class OrdersService {
                 await queryRunner.manager.save(stockMovement);
             }
             await queryRunner.commitTransaction();
+            await this.interactionService.logOrderDelivered(order.customerId, orderId);
             return this.findOne(orderId);
         }
         catch (error) {
@@ -202,6 +209,7 @@ exports.OrdersService = OrdersService = __decorate([
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
-        typeorm_2.DataSource])
+        typeorm_2.DataSource,
+        customer_interaction_service_1.CustomerInteractionService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

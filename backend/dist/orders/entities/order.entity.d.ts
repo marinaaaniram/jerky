@@ -1,4 +1,5 @@
 import { Customer } from '../../customers/entities/customer.entity';
+import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { DeliverySurvey } from '../../delivery-surveys/entities/delivery-survey.entity';
 export declare enum OrderStatus {
@@ -11,6 +12,8 @@ export declare class Order {
     id: number;
     customerId: number;
     customer: Customer;
+    userId?: number;
+    user?: User;
     orderDate: Date;
     status: OrderStatus;
     notes: string;

@@ -58,6 +58,7 @@ function NavbarLinks() {
     { label: 'Клиенты', path: '/customers', roles: ['Руководитель', 'Менеджер по продажам'] },
     { label: 'Товары', path: '/products', roles: ['Руководитель', 'Кладовщик'] },
     { label: 'Инвентаризация', path: '/inventory-check', roles: ['Руководитель', 'Кладовщик'] },
+    { label: 'Аналитика', path: '/analytics/sales', roles: ['Руководитель', 'Менеджер по продажам'] },
   ];
 
   const filteredLinks = links.filter((link) => {

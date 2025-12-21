@@ -14,6 +14,8 @@ const typeorm_1 = require("typeorm");
 const order_entity_1 = require("../../orders/entities/order.entity");
 const payment_entity_1 = require("../../payments/entities/payment.entity");
 const price_rule_entity_1 = require("../../price-rules/entities/price-rule.entity");
+const customer_comment_entity_1 = require("./customer-comment.entity");
+const customer_interaction_entity_1 = require("./customer-interaction.entity");
 var PaymentType;
 (function (PaymentType) {
     PaymentType["DIRECT"] = "\u043F\u0440\u044F\u043C\u044B\u0435";
@@ -30,6 +32,8 @@ let Customer = class Customer {
     orders;
     payments;
     priceRules;
+    comments;
+    interactions;
     createdAt;
     updatedAt;
 };
@@ -89,6 +93,18 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => price_rule_entity_1.PriceRule, priceRule => priceRule.customer),
     __metadata("design:type", Array)
 ], Customer.prototype, "priceRules", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => customer_comment_entity_1.CustomerComment, comment => comment.customer, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], Customer.prototype, "comments", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => customer_interaction_entity_1.CustomerInteraction, interaction => interaction.customer, {
+        cascade: true,
+    }),
+    __metadata("design:type", Array)
+], Customer.prototype, "interactions", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)({ name: 'created_at' }),
     __metadata("design:type", Date)

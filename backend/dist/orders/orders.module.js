@@ -18,6 +18,7 @@ const product_entity_1 = require("../products/entities/product.entity");
 const price_rule_entity_1 = require("../price-rules/entities/price-rule.entity");
 const stock_movement_entity_1 = require("../stock-movements/entities/stock-movement.entity");
 const delivery_survey_entity_1 = require("../delivery-surveys/entities/delivery-survey.entity");
+const customers_module_1 = require("../customers/customers.module");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
@@ -33,6 +34,7 @@ exports.OrdersModule = OrdersModule = __decorate([
                 stock_movement_entity_1.StockMovement,
                 delivery_survey_entity_1.DeliverySurvey,
             ]),
+            customers_module_1.CustomersModule,
         ],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService],

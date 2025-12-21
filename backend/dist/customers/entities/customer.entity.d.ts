@@ -1,6 +1,8 @@
 import { Order } from '../../orders/entities/order.entity';
 import { Payment } from '../../payments/entities/payment.entity';
 import { PriceRule } from '../../price-rules/entities/price-rule.entity';
+import { CustomerComment } from './customer-comment.entity';
+import { CustomerInteraction } from './customer-interaction.entity';
 export declare enum PaymentType {
     DIRECT = "\u043F\u0440\u044F\u043C\u044B\u0435",
     CONSIGNMENT = "\u0440\u0435\u0430\u043B\u0438\u0437\u0430\u0446\u0438\u044F"
@@ -16,6 +18,8 @@ export declare class Customer {
     orders: Order[];
     payments: Payment[];
     priceRules: PriceRule[];
+    comments: CustomerComment[];
+    interactions: CustomerInteraction[];
     createdAt: Date;
     updatedAt: Date;
 }

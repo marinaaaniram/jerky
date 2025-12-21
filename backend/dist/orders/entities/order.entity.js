@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Order = exports.OrderStatus = void 0;
 const typeorm_1 = require("typeorm");
 const customer_entity_1 = require("../../customers/entities/customer.entity");
+const user_entity_1 = require("../../users/entities/user.entity");
 const order_item_entity_1 = require("./order-item.entity");
 const delivery_survey_entity_1 = require("../../delivery-surveys/entities/delivery-survey.entity");
 var OrderStatus;
@@ -25,6 +26,8 @@ let Order = class Order {
     id;
     customerId;
     customer;
+    userId;
+    user;
     orderDate;
     status;
     notes;
@@ -47,6 +50,15 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: 'customer_id' }),
     __metadata("design:type", customer_entity_1.Customer)
 ], Order.prototype, "customer", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'user_id', nullable: true }),
+    __metadata("design:type", Number)
+], Order.prototype, "userId", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, { nullable: true, eager: true }),
+    (0, typeorm_1.JoinColumn)({ name: 'user_id' }),
+    __metadata("design:type", user_entity_1.User)
+], Order.prototype, "user", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: 'order_date', type: 'date' }),
     __metadata("design:type", Date)
