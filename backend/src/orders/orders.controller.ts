@@ -16,6 +16,8 @@ import { UpdateStatusDto } from './dto/update-status.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Controller('api/orders')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,8 +26,11 @@ export class OrdersController {
 
   @Post()
   @Roles('Руководитель', 'Кладовщик')
-  async create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.ordersService.create(createOrderDto, user.id);
   }
 
   @Get()

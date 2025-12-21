@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, OneToOne, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 import { Customer } from '../../customers/entities/customer.entity';
+import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { DeliverySurvey } from '../../delivery-surveys/entities/delivery-survey.entity';
 
@@ -23,6 +24,13 @@ export class Order {
   @ManyToOne(() => Customer, customer => customer.orders, { eager: true })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
+
+  @Column({ name: 'user_id', nullable: true })
+  userId?: number;
+
+  @ManyToOne(() => User, { nullable: true, eager: true })
+  @JoinColumn({ name: 'user_id' })
+  user?: User;
 
   @Column({ name: 'order_date', type: 'date' })
   orderDate: Date;

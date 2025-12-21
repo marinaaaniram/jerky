@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 import { Customer } from '../customers/entities/customer.entity';
+import { CustomerInteractionService } from '../customers/services/customer-interaction.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class PaymentsService {
     @InjectRepository(Customer)
     private customersRepository: Repository<Customer>,
     private dataSource: DataSource,
+    private interactionService: CustomerInteractionService,
   ) {}
 
   async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
@@ -44,6 +46,12 @@ export class PaymentsService {
       await queryRunner.manager.save(customer);
 
       await queryRunner.commitTransaction();
+
+      // Log interaction outside transaction
+      await this.interactionService.logPaymentReceived(
+        createPaymentDto.customerId,
+        createPaymentDto.amount,
+      );
 
       return payment;
     } catch (error) {

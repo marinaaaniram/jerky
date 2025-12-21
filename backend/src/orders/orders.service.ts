@@ -13,6 +13,7 @@ import { Product } from '../products/entities/product.entity';
 import { PriceRule } from '../price-rules/entities/price-rule.entity';
 import { StockMovement, MovementReason } from '../stock-movements/entities/stock-movement.entity';
 import { DeliverySurvey } from '../delivery-surveys/entities/delivery-survey.entity';
+import { CustomerInteractionService } from '../customers/services/customer-interaction.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { AddItemDto } from './dto/add-item.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
@@ -35,9 +36,10 @@ export class OrdersService {
     @InjectRepository(DeliverySurvey)
     private deliverySurveysRepository: Repository<DeliverySurvey>,
     private dataSource: DataSource,
+    private interactionService: CustomerInteractionService,
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+  async create(createOrderDto: CreateOrderDto, userId?: number): Promise<Order> {
     const customer = await this.customersRepository.findOne({
       where: { id: createOrderDto.customerId },
     });
@@ -50,12 +52,22 @@ export class OrdersService {
 
     const order = this.ordersRepository.create({
       customerId: createOrderDto.customerId,
+      userId,
       orderDate: new Date(),
       status: OrderStatus.NEW,
       notes: createOrderDto.notes,
     });
 
-    return this.ordersRepository.save(order);
+    const savedOrder = await this.ordersRepository.save(order);
+
+    // Log interaction
+    await this.interactionService.logOrderCreated(
+      createOrderDto.customerId,
+      savedOrder.id,
+      userId,
+    );
+
+    return savedOrder;
   }
 
   async findAll(): Promise<Order[]> {
@@ -217,6 +229,9 @@ export class OrdersService {
       }
 
       await queryRunner.commitTransaction();
+
+      // Log interaction outside transaction
+      await this.interactionService.logOrderDelivered(order.customerId, orderId);
 
       return this.findOne(orderId);
     } catch (error) {

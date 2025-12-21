@@ -2,7 +2,7 @@
 - ❌ Без "Co-Authored-By: Claude"
 - ✅ Все коммиты только от текущего пользователя git
 - ✅ Правила проекта имеют приоритет
-- ✅ Check and test through Docker only
+- ✅ Check and test through Docker only and then in playwright
 - ❌ Never run docker-compose down -v, don't lose data
 
 ## Data & Privacy (mandatory)

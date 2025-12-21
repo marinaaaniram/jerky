@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Up
 import { Order } from '../../orders/entities/order.entity';
 import { Payment } from '../../payments/entities/payment.entity';
 import { PriceRule } from '../../price-rules/entities/price-rule.entity';
+import { CustomerComment } from './customer-comment.entity';
+import { CustomerInteraction } from './customer-interaction.entity';
 
 export enum PaymentType {
   DIRECT = 'прямые',
@@ -55,6 +57,16 @@ export class Customer {
 
   @OneToMany(() => PriceRule, priceRule => priceRule.customer)
   priceRules: PriceRule[];
+
+  @OneToMany(() => CustomerComment, comment => comment.customer, {
+    cascade: true,
+  })
+  comments: CustomerComment[];
+
+  @OneToMany(() => CustomerInteraction, interaction => interaction.customer, {
+    cascade: true,
+  })
+  interactions: CustomerInteraction[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
