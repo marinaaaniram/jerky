@@ -13,5 +13,4 @@ export declare class DocumentGeneratorService {
     generateActOfServicesPDF(orderId: number): Promise<Buffer>;
     getActOfServicesHTML(orderId: number): Promise<string>;
     private htmlToPDF;
-    private renderHTMLToPDF;
 }

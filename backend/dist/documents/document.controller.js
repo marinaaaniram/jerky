@@ -136,7 +136,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DocumentController.prototype, "getActOfServicesHTML", null);
 exports.DocumentController = DocumentController = __decorate([
-    (0, common_1.Controller)('documents'),
+    (0, common_1.Controller)('api/documents'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [document_generator_service_1.DocumentGeneratorService])
 ], DocumentController);

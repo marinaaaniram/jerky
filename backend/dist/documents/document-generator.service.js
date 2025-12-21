@@ -19,7 +19,7 @@ exports.DocumentGeneratorService = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("@nestjs/typeorm");
-const pdfkit_1 = __importDefault(require("pdfkit"));
+const puppeteer_1 = __importDefault(require("puppeteer"));
 const order_entity_1 = require("../orders/entities/order.entity");
 const waybill_template_1 = require("./templates/waybill.template");
 const invoice_template_1 = require("./templates/invoice.template");
@@ -76,35 +76,36 @@ let DocumentGeneratorService = class DocumentGeneratorService {
         const order = await this.getOrderWithDetails(orderId);
         return new act_of_services_template_1.ActOfServicesTemplate(order).generate();
     }
-    htmlToPDF(html) {
-        return new Promise((resolve, reject) => {
-            const doc = new pdfkit_1.default({
-                bufferPages: true,
-                margin: 40,
+    async htmlToPDF(html) {
+        let browser = null;
+        try {
+            browser = await puppeteer_1.default.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox'],
             });
-            const chunks = [];
-            doc.on('data', (chunk) => {
-                chunks.push(chunk);
+            const page = await browser.newPage();
+            await page.setContent(html, { waitUntil: 'networkidle0' });
+            const pdfBuffer = await page.pdf({
+                format: 'A4',
+                margin: {
+                    top: '10mm',
+                    right: '10mm',
+                    bottom: '10mm',
+                    left: '10mm',
+                },
+                printBackground: true,
             });
-            doc.on('end', () => {
-                resolve(Buffer.concat(chunks));
-            });
-            doc.on('error', (err) => {
-                reject(err);
-            });
-            this.renderHTMLToPDF(doc, html);
-            doc.end();
-        });
-    }
-    renderHTMLToPDF(doc, html) {
-        const textContent = html.replace(/<[^>]*>/g, '');
-        const lines = textContent.split('\n').filter(line => line.trim());
-        doc.fontSize(11).font('Helvetica');
-        lines.forEach((line) => {
-            if (line.trim()) {
-                doc.text(line.trim(), { align: 'left' });
+            await page.close();
+            return Buffer.from(pdfBuffer);
+        }
+        catch (error) {
+            throw new Error(`PDF generation failed: ${error.message}`);
+        }
+        finally {
+            if (browser) {
+                await browser.close();
             }
-        });
+        }
     }
 };
 exports.DocumentGeneratorService = DocumentGeneratorService;

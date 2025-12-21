@@ -54,7 +54,8 @@
       "Bash(/tmp/test_inventory.sh)",
       "mcp__playwright__browser_close",
       "Bash(npx tsc:*)",
-      "Bash(docker-compose build:*)"
+      "Bash(docker-compose build:*)",
+      "Bash(docker-compose exec:*)"
     ],
     "deny": [
       "Bash(docker-compose down -v:*)",

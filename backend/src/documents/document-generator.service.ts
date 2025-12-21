@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import type { Browser } from 'puppeteer';
 import puppeteer from 'puppeteer';
 import { Order } from '../orders/entities/order.entity';
 import { WaybillTemplate } from './templates/waybill.template';
@@ -73,7 +74,7 @@ export class DocumentGeneratorService {
   }
 
   private async htmlToPDF(html: string): Promise<Buffer> {
-    let browser: puppeteer.Browser | null = null;
+    let browser: Browser | null = null;
     try {
       // Launch browser in headless mode
       browser = await puppeteer.launch({
@@ -99,7 +100,7 @@ export class DocumentGeneratorService {
       });
 
       await page.close();
-      return pdfBuffer;
+      return Buffer.from(pdfBuffer);
     } catch (error) {
       throw new Error(`PDF generation failed: ${(error as Error).message}`);
     } finally {
