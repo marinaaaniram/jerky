@@ -2,6 +2,7 @@ import { Container, Title, Table, Button, Group, LoadingOverlay, Text, Modal } f
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useProducts, useDeleteProduct } from '../hooks/useProducts';
+import { TableActionMenu } from '../../../components/TableActionMenu';
 
 export function ProductsPage() {
   const navigate = useNavigate();
@@ -62,23 +63,19 @@ export function ProductsPage() {
                   <Table.Td>{product.price.toFixed(2)} ₽</Table.Td>
                   <Table.Td>{product.stockQuantity}</Table.Td>
                   <Table.Td>
-                    <Group gap="xs">
-                      <Button
-                        size="xs"
-                        variant="light"
-                        onClick={() => navigate(`/products/${product.id}`)}
-                      >
-                        Редактировать
-                      </Button>
-                      <Button
-                        size="xs"
-                        color="red"
-                        variant="light"
-                        onClick={() => handleDeleteClick(product.id)}
-                      >
-                        Удалить
-                      </Button>
-                    </Group>
+                    <TableActionMenu
+                      actions={[
+                        {
+                          label: 'Редактировать',
+                          onClick: () => navigate(`/products/${product.id}`),
+                        },
+                        {
+                          label: 'Удалить',
+                          onClick: () => handleDeleteClick(product.id),
+                          color: 'red',
+                        },
+                      ]}
+                    />
                   </Table.Td>
                 </Table.Tr>
               ))}

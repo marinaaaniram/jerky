@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useOrders } from '../hooks/useOrders';
 import { OrderStatus } from '../../../types';
+import { TableActionMenu } from '../../../components/TableActionMenu';
 
 const statusColors: Record<string, string> = {
   [OrderStatus.NEW]: 'gray',
@@ -99,13 +100,14 @@ export function OrdersPage() {
                     )}
                   </Table.Td>
                   <Table.Td>
-                    <Button
-                      size="xs"
-                      variant="light"
-                      onClick={() => navigate(`/orders/${order.id}`)}
-                    >
-                      Подробнее
-                    </Button>
+                    <TableActionMenu
+                      actions={[
+                        {
+                          label: 'Подробнее',
+                          onClick: () => navigate(`/orders/${order.id}`),
+                        },
+                      ]}
+                    />
                   </Table.Td>
                 </Table.Tr>
               ))}

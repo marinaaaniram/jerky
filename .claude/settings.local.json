@@ -51,7 +51,8 @@
       "Bash(docker-compose exec backend npm run:*)",
       "Bash(docker-compose restart:*)",
       "Bash(xargs ls:*)",
-      "Bash(/tmp/test_inventory.sh)"
+      "Bash(/tmp/test_inventory.sh)",
+      "mcp__playwright__browser_close"
     ],
     "deny": [
       "Bash(docker-compose down -v:*)",

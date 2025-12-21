@@ -18,6 +18,7 @@ import { notifications } from '@mantine/notifications';
 import { useCustomers } from '../../../hooks/useCustomers';
 import { useCreateOrder, useAddOrderItem } from '../hooks/useOrders';
 import { useProducts } from '../../products/hooks/useProducts';
+import { TableActionMenu } from '../../../components/TableActionMenu';
 
 interface OrderItemDraft {
   productId: number;
@@ -239,15 +240,16 @@ export function CreateOrderPage() {
                       <Table.Td>{item.quantity}</Table.Td>
                       <Table.Td>{(item.price * item.quantity).toFixed(2)} ₽</Table.Td>
                       <Table.Td>
-                        <Button
-                          size="xs"
-                          color="red"
-                          variant="light"
-                          onClick={() => handleRemoveItem(item.productId)}
-                          leftSection={<IconTrash size={14} />}
-                        >
-                          Удалить
-                        </Button>
+                        <TableActionMenu
+                          actions={[
+                            {
+                              label: 'Удалить',
+                              onClick: () => handleRemoveItem(item.productId),
+                              color: 'red',
+                              icon: <IconTrash size={14} />,
+                            },
+                          ]}
+                        />
                       </Table.Td>
                     </Table.Tr>
                   ))}

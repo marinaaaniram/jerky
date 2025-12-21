@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useCustomers, useArchiveCustomer } from '../hooks/useCustomers';
 import { PaymentType } from '../../../types';
+import { TableActionMenu } from '../../../components/TableActionMenu';
 
 export function CustomersPage() {
   const navigate = useNavigate();
@@ -78,25 +79,20 @@ export function CustomersPage() {
                   <Table.Td>{getPaymentTypeLabel(customer.paymentType)}</Table.Td>
                   <Table.Td>{customer.debt.toFixed(2)} ₽</Table.Td>
                   <Table.Td>
-                    <Group gap="xs">
-                      <Button
-                        size="xs"
-                        variant="light"
-                        onClick={() => navigate(`/customers/${customer.id}`)}
-                      >
-                        Редактировать
-                      </Button>
-                      {!customer.isArchived && (
-                        <Button
-                          size="xs"
-                          color="orange"
-                          variant="light"
-                          onClick={() => handleArchiveClick(customer.id)}
-                        >
-                          Архивировать
-                        </Button>
-                      )}
-                    </Group>
+                    <TableActionMenu
+                      actions={[
+                        {
+                          label: 'Редактировать',
+                          onClick: () => navigate(`/customers/${customer.id}`),
+                        },
+                        {
+                          label: 'Архивировать',
+                          onClick: () => handleArchiveClick(customer.id),
+                          color: 'orange',
+                          visible: !customer.isArchived,
+                        },
+                      ]}
+                    />
                   </Table.Td>
                 </Table.Tr>
               ))}

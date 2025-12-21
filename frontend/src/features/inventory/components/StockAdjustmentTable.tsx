@@ -1,6 +1,7 @@
 import React from 'react';
-import { Table, Button, Group } from '@mantine/core';
+import { Table, Group } from '@mantine/core';
 import type { Product } from '../../../types';
+import { TableActionMenu } from '../../../components/TableActionMenu';
 
 interface StockAdjustmentTableProps {
   products: Product[];
@@ -23,14 +24,15 @@ export const StockAdjustmentTable: React.FC<StockAdjustmentTableProps> = ({
       </Table.Td>
       <Table.Td>
         <Group justify="flex-end" gap="xs">
-          <Button
-            size="sm"
-            variant="light"
-            onClick={() => onEditClick(product)}
-            disabled={isLoading}
-          >
-            Изменить остаток
-          </Button>
+          <TableActionMenu
+            actions={[
+              {
+                label: 'Изменить остаток',
+                onClick: () => onEditClick(product),
+                visible: !isLoading,
+              },
+            ]}
+          />
         </Group>
       </Table.Td>
     </Table.Tr>
