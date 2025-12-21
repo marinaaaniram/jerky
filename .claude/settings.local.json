@@ -52,7 +52,9 @@
       "Bash(docker-compose restart:*)",
       "Bash(xargs ls:*)",
       "Bash(/tmp/test_inventory.sh)",
-      "mcp__playwright__browser_close"
+      "mcp__playwright__browser_close",
+      "Bash(npx tsc:*)",
+      "Bash(docker-compose build:*)"
     ],
     "deny": [
       "Bash(docker-compose down -v:*)",
