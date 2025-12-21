@@ -77,6 +77,116 @@ let StockMovementsService = class StockMovementsService {
         }
         return movement;
     }
+    async adjustStock(productId, adjustStockDto, currentUser) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const product = await queryRunner.manager.findOne(product_entity_1.Product, {
+                where: { id: productId },
+            });
+            if (!product) {
+                throw new common_1.NotFoundException(`Product with ID ${productId} not found`);
+            }
+            if (adjustStockDto.newQuantity < 0) {
+                throw new common_1.BadRequestException(`Stock quantity cannot be negative. Requested: ${adjustStockDto.newQuantity}`);
+            }
+            const quantityChange = adjustStockDto.newQuantity - product.stockQuantity;
+            const stockMovement = queryRunner.manager.create(stock_movement_entity_1.StockMovement, {
+                productId,
+                quantityChange,
+                reason: adjustStockDto.reason,
+                reasonText: adjustStockDto.reasonText,
+                movementDate: new Date(),
+                userId: currentUser.id,
+                isActive: true,
+            });
+            await queryRunner.manager.save(stockMovement);
+            product.stockQuantity = adjustStockDto.newQuantity;
+            await queryRunner.manager.save(product);
+            await queryRunner.commitTransaction();
+            return stockMovement;
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async cancelMovement(movementId, cancelMovementDto, currentUser) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const originalMovement = await queryRunner.manager.findOne(stock_movement_entity_1.StockMovement, {
+                where: { id: movementId },
+                relations: ['product'],
+            });
+            if (!originalMovement) {
+                throw new common_1.NotFoundException(`Stock movement with ID ${movementId} not found`);
+            }
+            if (originalMovement.cancelledBy) {
+                throw new common_1.BadRequestException(`Stock movement with ID ${movementId} is already cancelled`);
+            }
+            originalMovement.cancelledBy = currentUser.id;
+            originalMovement.isActive = false;
+            await queryRunner.manager.save(originalMovement);
+            const reverseMovement = queryRunner.manager.create(stock_movement_entity_1.StockMovement, {
+                productId: originalMovement.productId,
+                quantityChange: -originalMovement.quantityChange,
+                reason: stock_movement_entity_1.MovementReason.CORRECTION,
+                reasonText: `Отмена операции #${movementId}. ${cancelMovementDto.reason || ''}`.trim(),
+                movementDate: new Date(),
+                userId: currentUser.id,
+                isActive: true,
+            });
+            await queryRunner.manager.save(reverseMovement);
+            const product = originalMovement.product;
+            product.stockQuantity += reverseMovement.quantityChange;
+            if (product.stockQuantity < 0) {
+                throw new common_1.BadRequestException(`Cannot cancel movement: would result in negative stock`);
+            }
+            await queryRunner.manager.save(product);
+            await queryRunner.commitTransaction();
+            return reverseMovement;
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw error;
+        }
+        finally {
+            await queryRunner.release();
+        }
+    }
+    async getProductHistory(productId) {
+        const product = await this.productsRepository.findOne({
+            where: { id: productId },
+        });
+        if (!product) {
+            throw new common_1.NotFoundException(`Product with ID ${productId} not found`);
+        }
+        return this.stockMovementsRepository
+            .createQueryBuilder('movement')
+            .leftJoinAndSelect('movement.user', 'user')
+            .leftJoinAndSelect('movement.cancelledByUser', 'cancelledByUser')
+            .where('movement.productId = :productId', { productId })
+            .orderBy('movement.createdAt', 'DESC')
+            .getMany();
+    }
+    async getActiveMovements(productId) {
+        const query = this.stockMovementsRepository
+            .createQueryBuilder('movement')
+            .leftJoinAndSelect('movement.product', 'product')
+            .leftJoinAndSelect('movement.user', 'user')
+            .where('movement.isActive = :isActive', { isActive: true })
+            .orderBy('movement.createdAt', 'DESC');
+        if (productId) {
+            query.andWhere('movement.productId = :productId', { productId });
+        }
+        return query.getMany();
+    }
 };
 exports.StockMovementsService = StockMovementsService;
 exports.StockMovementsService = StockMovementsService = __decorate([

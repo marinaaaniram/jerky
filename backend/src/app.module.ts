@@ -15,6 +15,7 @@ import { StockMovementsModule } from './stock-movements/stock-movements.module';
 import { PriceRulesModule } from './price-rules/price-rules.module';
 import { DeliverySurveysModule } from './delivery-surveys/delivery-surveys.module';
 import { SearchModule } from './search/search.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SearchModule } from './search/search.module';
     PriceRulesModule,
     DeliverySurveysModule,
     SearchModule,
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseInitService],

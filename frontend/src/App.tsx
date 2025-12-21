@@ -7,6 +7,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { OrdersPage } from './features/orders/pages/OrdersPage';
 import { OrderDetailsPage } from './features/orders/pages/OrderDetailsPage';
 import { CreateOrderPage } from './features/orders/pages/CreateOrderPage';
+import { OrderDocumentsPage } from './features/documents/pages/OrderDocumentsPage';
 import { ProductsPage } from './features/products/pages/ProductsPage';
 import { CreateProductPage } from './features/products/pages/CreateProductPage';
 import { ProductDetailsPage } from './features/products/pages/ProductDetailsPage';
@@ -55,6 +56,7 @@ function App() {
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/new" element={<CreateOrderPage />} />
               <Route path="/orders/:id" element={<OrderDetailsPage />} />
+              <Route path="/orders/:id/documents" element={<OrderDocumentsPage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/new" element={<CreateProductPage />} />
               <Route path="/products/:id" element={<ProductDetailsPage />} />

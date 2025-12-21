@@ -23,6 +23,8 @@ const payments_module_1 = require("./payments/payments.module");
 const stock_movements_module_1 = require("./stock-movements/stock-movements.module");
 const price_rules_module_1 = require("./price-rules/price-rules.module");
 const delivery_surveys_module_1 = require("./delivery-surveys/delivery-surveys.module");
+const search_module_1 = require("./search/search.module");
+const documents_module_1 = require("./documents/documents.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +42,8 @@ exports.AppModule = AppModule = __decorate([
             stock_movements_module_1.StockMovementsModule,
             price_rules_module_1.PriceRulesModule,
             delivery_surveys_module_1.DeliverySurveysModule,
+            search_module_1.SearchModule,
+            documents_module_1.DocumentsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService, database_init_service_1.DatabaseInitService],

@@ -13,7 +13,7 @@ import {
   Select,
   Grid,
 } from '@mantine/core';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowLeft, IconFileText } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useOrder, useUpdateOrderStatus, useOrderTotal } from '../hooks/useOrders';
 import { useAuthStore } from '../../../store/authStore';
@@ -274,6 +274,23 @@ export function OrderDetailsPage() {
           </Stack>
         </Card>
       )}
+
+      <Card shadow="sm" padding="lg" mb="xl">
+        <Group justify="space-between" mb="md">
+          <Title order={3}>Документы</Title>
+          <Button
+            variant="light"
+            size="sm"
+            leftSection={<IconFileText size={16} />}
+            onClick={() => navigate(`/orders/${orderId}/documents`)}
+          >
+            Открыть
+          </Button>
+        </Group>
+        <Text size="sm" c="dimmed">
+          Накладные, счет-фактуры, отчеты о доставке и акты выполненных работ
+        </Text>
+      </Card>
 
       <AddItemModal
         opened={addItemModalOpened}
