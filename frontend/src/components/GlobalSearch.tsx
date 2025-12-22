@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react';
-import { TextInput, Paper, Group, Text, ActionIcon, Loader, Stack, Badge, Flex } from '@mantine/core';
+import { TextInput, Paper, Group, Text, ActionIcon, Loader, Stack, Badge, Flex, useMantineTheme } from '@mantine/core';
 import { IconSearch, IconX } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { searchAPI, type SearchResult } from '../api/search';
-import styles from './GlobalSearch.module.css';
 
 const statusColors: Record<string, string> = {
   'Новый': 'gray',
@@ -18,6 +17,7 @@ export function GlobalSearch() {
   const [loading, setLoading] = useState(false);
   const [opened, setOpened] = useState(false);
   const navigate = useNavigate();
+  const theme = useMantineTheme();
 
   const handleSearch = useCallback(async (searchQuery: string) => {
     if (searchQuery.trim().length < 2) {
@@ -68,7 +68,7 @@ export function GlobalSearch() {
   };
 
   return (
-    <div className={styles.searchContainer}>
+    <div style={{ display: 'flex', alignItems: 'center', flex: 1, maxWidth: 500 }}>
       <div style={{ position: 'relative', flex: 1, maxWidth: 400 }}>
         <TextInput
           placeholder="Поиск по заказам, клиентам, товарам..."
@@ -92,17 +92,18 @@ export function GlobalSearch() {
 
         {opened && results.length > 0 && (
           <Paper
-            className={styles.resultsDropdown}
             shadow="md"
             p="xs"
             radius="md"
-            style={{
+            sx={{
               position: 'absolute',
               top: '100%',
               left: 0,
               right: 0,
               zIndex: 1000,
               marginTop: 4,
+              boxShadow: theme.shadows.md,
+              border: `1px solid ${theme.colors.gray[2]}`,
             }}
           >
             <Stack gap="xs" style={{ maxHeight: '500px', overflowY: 'auto' }}>
@@ -114,6 +115,7 @@ export function GlobalSearch() {
                       key={`${result.type}-${result.id}`}
                       result={result}
                       onClick={() => handleResultClick(result)}
+                      theme={theme}
                     />
                   ))}
                 </>
@@ -127,6 +129,7 @@ export function GlobalSearch() {
                       key={`${result.type}-${result.id}`}
                       result={result}
                       onClick={() => handleResultClick(result)}
+                      theme={theme}
                     />
                   ))}
                 </>
@@ -140,6 +143,7 @@ export function GlobalSearch() {
                       key={`${result.type}-${result.id}`}
                       result={result}
                       onClick={() => handleResultClick(result)}
+                      theme={theme}
                     />
                   ))}
                 </>
@@ -150,11 +154,10 @@ export function GlobalSearch() {
 
         {opened && results.length === 0 && !loading && query.length >= 2 && (
           <Paper
-            className={styles.resultsDropdown}
             shadow="md"
             p="md"
             radius="md"
-            style={{
+            sx={{
               position: 'absolute',
               top: '100%',
               left: 0,
@@ -162,6 +165,8 @@ export function GlobalSearch() {
               zIndex: 1000,
               marginTop: 4,
               textAlign: 'center',
+              boxShadow: theme.shadows.md,
+              border: `1px solid ${theme.colors.gray[2]}`,
             }}
           >
             <Text size="sm" c="dimmed">
@@ -177,9 +182,12 @@ export function GlobalSearch() {
 interface SearchResultItemProps {
   result: SearchResult;
   onClick: () => void;
+  theme?: any;
 }
 
-function SearchResultItem({ result, onClick }: SearchResultItemProps) {
+function SearchResultItem({ result, onClick, theme: injectedTheme }: SearchResultItemProps) {
+  const theme = injectedTheme || useMantineTheme();
+
   const getTypeColor = (type: SearchResult['type']) => {
     const colors: Record<SearchResult['type'], string> = {
       order: '#4c6ef5',
@@ -197,8 +205,14 @@ function SearchResultItem({ result, onClick }: SearchResultItemProps) {
   if (result.type === 'order' && result.status) {
     return (
       <div
-        className={styles.resultItem}
         onClick={onClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            onClick();
+          }
+        }}
         style={{
           padding: '12px',
           borderRadius: '6px',
@@ -206,7 +220,7 @@ function SearchResultItem({ result, onClick }: SearchResultItemProps) {
           transition: 'background-color 0.15s ease',
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.backgroundColor = '#f5f5f5';
+          (e.currentTarget as HTMLElement).style.backgroundColor = theme.colors.gray[1];
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
@@ -251,8 +265,14 @@ function SearchResultItem({ result, onClick }: SearchResultItemProps) {
   // Default rendering for other types
   return (
     <div
-      className={styles.resultItem}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          onClick();
+        }
+      }}
       style={{
         padding: '10px 12px',
         borderRadius: '6px',
@@ -260,7 +280,7 @@ function SearchResultItem({ result, onClick }: SearchResultItemProps) {
         transition: 'background-color 0.15s ease',
       }}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.backgroundColor = '#f5f5f5';
+        (e.currentTarget as HTMLElement).style.backgroundColor = theme.colors.gray[1];
       }}
       onMouseLeave={(e) => {
         (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';

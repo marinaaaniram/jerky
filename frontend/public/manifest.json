@@ -1,0 +1,99 @@
+{
+  "name": "Jerky - Система управления доставкой",
+  "short_name": "Jerky",
+  "description": "Профессиональная система управления доставкой с аналитикой и отслеживанием заказов",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#4a90e2",
+  "background_color": "#ffffff",
+  "prefer_related_applications": false,
+  "categories": ["business", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshot-small.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "purpose": "any"
+    },
+    {
+      "src": "/screenshot-large.png",
+      "sizes": "1280x1024",
+      "type": "image/png",
+      "form_factor": "wide",
+      "purpose": "any"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Создать заказ",
+      "short_name": "Новый заказ",
+      "description": "Быстро создать новый заказ доставки",
+      "url": "/orders/new",
+      "icons": [
+        {
+          "src": "/icon-order.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "Заказы",
+      "short_name": "Заказы",
+      "description": "Просмотреть список активных заказов",
+      "url": "/orders",
+      "icons": [
+        {
+          "src": "/icon-orders.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    {
+      "name": "Аналитика",
+      "short_name": "Отчеты",
+      "description": "Посмотреть аналитику и отчеты",
+      "url": "/analytics/sales",
+      "icons": [
+        {
+          "src": "/icon-analytics.png",
+          "sizes": "96x96",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    }
+  ]
+}

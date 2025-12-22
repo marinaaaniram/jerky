@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from './features/auth/LoginPage';
@@ -23,9 +23,11 @@ import { OrderStatusReportPage } from './features/analytics/pages/OrderStatusRep
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
+import { theme } from './theme/theme';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
+import './index.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,7 +42,10 @@ function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <MantineProvider>
+    <MantineProvider
+      theme={theme}
+      defaultColorScheme="auto"
+    >
       <Notifications />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>

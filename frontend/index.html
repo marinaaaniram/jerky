@@ -1,10 +1,47 @@
 <!doctype html>
 <html lang="ru">
   <head>
+    <!-- Charset and Viewport -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA & App Meta Tags -->
+    <meta name="application-name" content="Jerky" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Jerky" />
+    <meta name="theme-color" content="#2196f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" sizes="any" />
+    <link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192" />
+    <link rel="icon" type="image/png" href="/icon-512.png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Branding & Description -->
     <title>Jerky - Система управления доставкой</title>
+    <meta name="description" content="Профессиональная система управления доставкой с аналитикой и отслеживанием заказов. Управляйте заказами, клиентами и товарами в одном месте." />
+    <meta name="keywords" content="доставка, управление, заказы, логистика, аналитика" />
+
+    <!-- Social Media Meta Tags -->
+    <meta property="og:title" content="Jerky - Система управления доставкой" />
+    <meta property="og:description" content="Профессиональная система управления доставкой с аналитикой" />
+    <meta property="og:type" content="website" />
+
+    <!-- Security & Performance -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Service Worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
