@@ -1,10 +1,12 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { AppShell, Burger, Group, Title, Button, Text, ActionIcon, Tooltip, Stack } from '@mantine/core';
+import { AppShell, Burger, Group, Title, Button, Stack, Box } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { GlobalSearch } from '../GlobalSearch';
 import { PWAInstallButton } from '../PWAInstallButton';
+import { UserAvatar } from '../UserAvatar';
+import { MobileSearch } from '../MobileSearch';
 import {
   IconDashboard,
   IconShoppingCart,
@@ -12,20 +14,14 @@ import {
   IconPackage,
   IconClipboardList,
   IconChartBar,
-  IconLogout,
 } from '@tabler/icons-react';
 
 export function AppLayout() {
   const [opened, { toggle, close }] = useDisclosure();
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
   const location = useLocation();
   const isMobile = useMediaQuery('(max-width: 768px)') || false;
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   return (
     <AppShell
@@ -45,9 +41,9 @@ export function AppLayout() {
             />
             <Title
               order={3}
-              size={isMobile ? 'h4' : 'h3'}
+              size={isMobile ? 'h5' : 'h3'}
               fw={700}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
               onClick={() => {
                 navigate('/');
                 if (isMobile) close();
@@ -57,37 +53,26 @@ export function AppLayout() {
             </Title>
           </Group>
 
-          <GlobalSearch />
+          <Box visibleFrom="xs" style={{ flex: 1, minWidth: 0 }}>
+            <GlobalSearch />
+          </Box>
 
           <Group gap="xs" h="100%" wrap="nowrap">
-            <PWAInstallButton />
+            <Box visibleFrom="xs">
+              <PWAInstallButton />
+            </Box>
 
-            <Text
-              size="sm"
-              fw={500}
-              hiddenFrom="xs"
-              truncate
-              title={`${user?.firstName} ${user?.lastName}`}
-            >
-              {user?.firstName}
-            </Text>
+            <Box hiddenFrom="xs">
+              <MobileSearch />
+            </Box>
 
-            <Tooltip label="Выход">
-              <ActionIcon
-                onClick={handleLogout}
-                variant="subtle"
-                color="gray"
-                aria-label="Выход из аккаунта"
-              >
-                <IconLogout size={20} />
-              </ActionIcon>
-            </Tooltip>
+            <UserAvatar />
           </Group>
         </Group>
       </AppShell.Header>
 
       <AppShell.Navbar p="md">
-        <NavbarLinks isMobile={isMobile} currentPath={location.pathname} onNavigate={close} />
+        <NavbarLinks currentPath={location.pathname} onNavigate={close} />
       </AppShell.Navbar>
 
       <AppShell.Main>
@@ -105,11 +90,9 @@ interface NavbarLink {
 }
 
 function NavbarLinks({
-  isMobile,
   currentPath,
   onNavigate,
 }: {
-  isMobile: boolean;
   currentPath: string;
   onNavigate: () => void;
 }) {
@@ -153,44 +136,27 @@ function NavbarLinks({
   const isActive = (path: string) => currentPath === path || currentPath.startsWith(path + '/');
 
   return (
-    <Stack gap={isMobile ? 'xs' : 'sm'}>
-      {filteredLinks.map((link) =>
-        isMobile ? (
-          <Tooltip key={link.path} label={link.label} position="right">
-            <ActionIcon
-              onClick={() => {
-                navigate(link.path);
-                onNavigate();
-              }}
-              variant={isActive(link.path) ? 'light' : 'subtle'}
-              color={isActive(link.path) ? 'blue' : 'gray'}
-              size="lg"
-              radius="md"
-              aria-label={link.label}
-              title={link.label}
-            >
-              {link.icon}
-            </ActionIcon>
-          </Tooltip>
-        ) : (
-          <Button
-            key={link.path}
-            onClick={() => {
-              navigate(link.path);
-              onNavigate();
-            }}
-            variant={isActive(link.path) ? 'light' : 'subtle'}
-            color={isActive(link.path) ? 'blue' : 'gray'}
-            fullWidth
-            justify="flex-start"
-            leftSection={link.icon}
-            fw={isActive(link.path) ? 600 : 500}
-            aria-current={isActive(link.path) ? 'page' : undefined}
-          >
-            {link.label}
-          </Button>
-        )
-      )}
+    <Stack gap="md">
+      {filteredLinks.map((link) => (
+        <Button
+          key={link.path}
+          onClick={() => {
+            navigate(link.path);
+            onNavigate();
+          }}
+          variant={isActive(link.path) ? 'filled' : 'light'}
+          color={isActive(link.path) ? 'blue' : 'gray'}
+          fullWidth
+          justify="flex-start"
+          leftSection={link.icon}
+          fw={isActive(link.path) ? 600 : 500}
+          size="md"
+          py="sm"
+          aria-current={isActive(link.path) ? 'page' : undefined}
+        >
+          {link.label}
+        </Button>
+      ))}
     </Stack>
   );
 }

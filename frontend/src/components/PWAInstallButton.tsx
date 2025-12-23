@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, Tooltip } from '@mantine/core';
+import { Button, Tooltip, ActionIcon } from '@mantine/core';
 import { IconDownload } from '@tabler/icons-react';
+import { useMediaQuery } from '@mantine/hooks';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -10,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAInstallButton() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)') || false;
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -52,6 +54,20 @@ export function PWAInstallButton() {
 
   if (!isInstallable) {
     return null;
+  }
+
+  if (isMobile) {
+    return (
+      <Tooltip label="Установить приложение">
+        <ActionIcon
+          onClick={handleInstall}
+          variant="subtle"
+          aria-label="Установить приложение"
+        >
+          <IconDownload size={20} />
+        </ActionIcon>
+      </Tooltip>
+    );
   }
 
   return (
