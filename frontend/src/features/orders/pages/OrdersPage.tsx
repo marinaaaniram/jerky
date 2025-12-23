@@ -1,9 +1,11 @@
-import { Container, Title, Table, Badge, Button, Group, LoadingOverlay, Text, Tooltip } from '@mantine/core';
+import { Container, Title, Table, Badge, Button, Group, LoadingOverlay, Text, Tooltip, SimpleGrid } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useOrders } from '../hooks/useOrders';
 import { OrderStatus } from '../../../types';
 import { TableActionMenu } from '../../../components/TableActionMenu';
+import { OrderCard } from '../components/OrderCard';
 
 const statusColors: Record<string, string> = {
   [OrderStatus.NEW]: 'gray',
@@ -14,6 +16,7 @@ const statusColors: Record<string, string> = {
 
 export function OrdersPage() {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const { data: orders, isLoading, error } = useOrders();
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
@@ -37,8 +40,8 @@ export function OrdersPage() {
   ];
 
   return (
-    <Container size="xl">
-      <Group justify="space-between" mb="xl">
+    <Container size="xl" pt={0} py={0} mt={0}>
+      <Group justify="space-between" mb="xl" mt={0}>
         <Title order={2}>Заказы</Title>
         <Button onClick={() => navigate('/orders/new')}>Создать заказ</Button>
       </Group>
@@ -66,53 +69,64 @@ export function OrdersPage() {
         <LoadingOverlay visible={isLoading} />
 
         {filteredOrders && filteredOrders.length > 0 ? (
-          <Table striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>№</Table.Th>
-                <Table.Th>Дата</Table.Th>
-                <Table.Th>Клиент</Table.Th>
-                <Table.Th>Статус</Table.Th>
-                <Table.Th>Позиций</Table.Th>
-                <Table.Th>Примечания</Table.Th>
-                <Table.Th>Действия</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
+          isMobile ? (
+            <SimpleGrid cols={1} spacing="md">
               {filteredOrders.map((order) => (
-                <Table.Tr key={order.id}>
-                  <Table.Td>{order.id}</Table.Td>
-                  <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
-                  <Table.Td>{order.customer.name}</Table.Td>
-                  <Table.Td>
-                    <Badge color={statusColors[order.status]}>{order.status}</Badge>
-                  </Table.Td>
-                  <Table.Td>{order.orderItems.length}</Table.Td>
-                  <Table.Td>
-                    {order.notes ? (
-                      <Tooltip label={order.notes} multiline maw={300}>
-                        <Text size="sm" c="dimmed" lineClamp={1} style={{ cursor: 'help' }}>
-                          📝 {order.notes}
-                        </Text>
-                      </Tooltip>
-                    ) : (
-                      <Text size="sm" c="dimmed">—</Text>
-                    )}
-                  </Table.Td>
-                  <Table.Td>
-                    <TableActionMenu
-                      actions={[
-                        {
-                          label: 'Подробнее',
-                          onClick: () => navigate(`/orders/${order.id}`),
-                        },
-                      ]}
-                    />
-                  </Table.Td>
-                </Table.Tr>
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  statusColors={statusColors}
+                  onView={(id) => navigate(`/orders/${id}`)}
+                />
               ))}
-            </Table.Tbody>
-          </Table>
+            </SimpleGrid>
+          ) : (
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Дата</Table.Th>
+                  <Table.Th>Клиент</Table.Th>
+                  <Table.Th>Статус</Table.Th>
+                  <Table.Th>Позиций</Table.Th>
+                  <Table.Th>Примечания</Table.Th>
+                  <Table.Th>Действия</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {filteredOrders.map((order) => (
+                  <Table.Tr key={order.id}>
+                    <Table.Td>{new Date(order.orderDate).toLocaleDateString('ru-RU')}</Table.Td>
+                    <Table.Td>{order.customer.name}</Table.Td>
+                    <Table.Td>
+                      <Badge color={statusColors[order.status]}>{order.status}</Badge>
+                    </Table.Td>
+                    <Table.Td>{order.orderItems.length}</Table.Td>
+                    <Table.Td>
+                      {order.notes ? (
+                        <Tooltip label={order.notes} multiline maw={300}>
+                          <Text size="sm" c="dimmed" lineClamp={1} style={{ cursor: 'help' }}>
+                            📝 {order.notes}
+                          </Text>
+                        </Tooltip>
+                      ) : (
+                        <Text size="sm" c="dimmed">—</Text>
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      <TableActionMenu
+                        actions={[
+                          {
+                            label: 'Подробнее',
+                            onClick: () => navigate(`/orders/${order.id}`),
+                          },
+                        ]}
+                      />
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          )
         ) : (
           !isLoading && <Text c="dimmed">Заказов пока нет</Text>
         )}

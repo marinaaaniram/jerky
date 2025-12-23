@@ -58,41 +58,12 @@ header[class*="mantine-AppShell-header"] {
   }
 }
 
-/* Mobile table scrolling - Prevent horizontal overflow */
+/* Mobile responsive - Constrain AppShell main content */
 @media (max-width: 768px) {
-  /* Constrain AppShell main content */
   main {
     overflow-x: hidden !important;
     width: 100% !important;
     max-width: 100vw !important;
-  }
-
-  /* Hide less important columns completely */
-  table td:nth-child(3),
-  table th:nth-child(3),
-  table td:nth-child(4),
-  table th:nth-child(4),
-  table td:nth-child(6),
-  table th:nth-child(6) {
-    display: none !important;
-  }
-
-  /* Make table fit the screen */
-  table {
-    width: 100% !important;
-    max-width: 100% !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-    font-size: 11px !important;
-  }
-
-  /* Compact cells for mobile */
-  td, th {
-    padding: 4px 2px !important;
-    font-size: 10px !important;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    white-space: normal;
   }
 }
 
@@ -172,6 +143,13 @@ header[class*="mantine-AppShell-header"] {
 @media (max-width: 768px) {
   main {
     margin-left: 0 !important;
+  }
+}
+
+/* Desktop navbar layout - keep navbar, but ensure main has proper margin */
+@media (min-width: 769px) {
+  main {
+    margin-left: 300px !important;
   }
 }
 

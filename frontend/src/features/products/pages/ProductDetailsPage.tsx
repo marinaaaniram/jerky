@@ -33,8 +33,8 @@ export function ProductDetailsPage() {
   };
 
   return (
-    <Container size="xl">
-      <Group justify="flex-start" mb="xl" gap="xs">
+    <Container size="xl" pt={0} py={0} mt={0}>
+      <Group justify="flex-start" mb="xl" mt={0} gap="xs">
         <Button variant="subtle" onClick={() => navigate('/products')} leftSection={<IconArrowLeft size={18} />}>
           Назад
         </Button>

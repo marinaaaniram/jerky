@@ -27,7 +27,7 @@ export function AppLayout() {
     <AppShell
       header={{ height: isMobile ? 60 : 70 }}
       navbar={{ width: isMobile ? 280 : 300, breakpoint: 'md', collapsed: { mobile: !opened } }}
-      padding="md"
+      padding={{ top: 0, bottom: 'md', left: 'md', right: 'md' }}
     >
       <AppShell.Header p="md">
         <Group justify="space-between" h="100%" wrap="nowrap">

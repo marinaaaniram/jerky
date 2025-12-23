@@ -1,12 +1,15 @@
-import { Container, Title, Table, Button, Group, LoadingOverlay, Text, Modal, Checkbox, Stack } from '@mantine/core';
+import { Container, Title, Table, Button, Group, LoadingOverlay, Text, Modal, Checkbox, Stack, SimpleGrid } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useMediaQuery } from '@mantine/hooks';
 import { useCustomers, useArchiveCustomer } from '../hooks/useCustomers';
 import { PaymentType } from '../../../types';
 import { TableActionMenu } from '../../../components/TableActionMenu';
+import { CustomerCard } from '../components/CustomerCard';
 
 export function CustomersPage() {
   const navigate = useNavigate();
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const { data: customers, isLoading, error } = useCustomers();
   const archiveCustomer = useArchiveCustomer();
   const [archiveId, setArchiveId] = useState<number | null>(null);
@@ -41,8 +44,8 @@ export function CustomersPage() {
   };
 
   return (
-    <Container size="xl">
-      <Group justify="space-between" mb="xl">
+    <Container size="xl" pt={0} py={0} mt={0}>
+      <Group justify="space-between" mb="xl" mt={0}>
         <Title order={2}>Клиенты</Title>
         <Button onClick={() => navigate('/customers/new')}>Добавить клиента</Button>
       </Group>
@@ -59,45 +62,56 @@ export function CustomersPage() {
         <LoadingOverlay visible={isLoading} />
 
         {filteredCustomers && filteredCustomers.length > 0 ? (
-          <Table striped highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>№</Table.Th>
-                <Table.Th>Наименование</Table.Th>
-                <Table.Th>Телефон</Table.Th>
-                <Table.Th>Тип оплаты</Table.Th>
-                <Table.Th>Долг</Table.Th>
-                <Table.Th>Действия</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
+          isMobile ? (
+            <SimpleGrid cols={1} spacing="md">
               {filteredCustomers.map((customer) => (
-                <Table.Tr key={customer.id}>
-                  <Table.Td>{customer.id}</Table.Td>
-                  <Table.Td>{customer.name}</Table.Td>
-                  <Table.Td>{customer.phone || '-'}</Table.Td>
-                  <Table.Td>{getPaymentTypeLabel(customer.paymentType)}</Table.Td>
-                  <Table.Td>{customer.debt.toFixed(2)} ₽</Table.Td>
-                  <Table.Td>
-                    <TableActionMenu
-                      actions={[
-                        {
-                          label: 'Редактировать',
-                          onClick: () => navigate(`/customers/${customer.id}`),
-                        },
-                        {
-                          label: 'Архивировать',
-                          onClick: () => handleArchiveClick(customer.id),
-                          color: 'orange',
-                          visible: !customer.isArchived,
-                        },
-                      ]}
-                    />
-                  </Table.Td>
-                </Table.Tr>
+                <CustomerCard
+                  key={customer.id}
+                  customer={customer}
+                  onEdit={(id) => navigate(`/customers/${id}`)}
+                  onArchive={handleArchiveClick}
+                />
               ))}
-            </Table.Tbody>
-          </Table>
+            </SimpleGrid>
+          ) : (
+            <Table striped highlightOnHover>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Наименование</Table.Th>
+                  <Table.Th>Телефон</Table.Th>
+                  <Table.Th>Тип оплаты</Table.Th>
+                  <Table.Th>Долг</Table.Th>
+                  <Table.Th>Действия</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {filteredCustomers.map((customer) => (
+                  <Table.Tr key={customer.id}>
+                    <Table.Td>{customer.name}</Table.Td>
+                    <Table.Td>{customer.phone || '-'}</Table.Td>
+                    <Table.Td>{getPaymentTypeLabel(customer.paymentType)}</Table.Td>
+                    <Table.Td>{customer.debt.toFixed(2)} ₽</Table.Td>
+                    <Table.Td>
+                      <TableActionMenu
+                        actions={[
+                          {
+                            label: 'Редактировать',
+                            onClick: () => navigate(`/customers/${customer.id}`),
+                          },
+                          {
+                            label: 'Архивировать',
+                            onClick: () => handleArchiveClick(customer.id),
+                            color: 'orange',
+                            visible: !customer.isArchived,
+                          },
+                        ]}
+                      />
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          )
         ) : (
           !isLoading && <Text c="dimmed">Клиентов пока нет</Text>
         )}
