@@ -3,9 +3,6 @@ import type { MantineThemeOverride } from '@mantine/core';
 export const theme: MantineThemeOverride = {
   primaryColor: 'blue',
 
-  // Default color scheme
-  colorScheme: 'light',
-
   colors: {
     blue: [
       '#e3f2fd',

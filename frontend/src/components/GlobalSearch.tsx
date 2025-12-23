@@ -95,7 +95,7 @@ export function GlobalSearch() {
             shadow="md"
             p="xs"
             radius="md"
-            sx={{
+            style={{
               position: 'absolute',
               top: '100%',
               left: 0,
@@ -157,7 +157,7 @@ export function GlobalSearch() {
             shadow="md"
             p="md"
             radius="md"
-            sx={{
+            style={{
               position: 'absolute',
               top: '100%',
               left: 0,

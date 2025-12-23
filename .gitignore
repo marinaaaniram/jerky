@@ -27,3 +27,5 @@ database.sqlite
 
 # Test artifacts
 .playwright-mcp/
+
+.claude/

@@ -52,10 +52,13 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (response.ok) {
-            const cache = caches.open(API_CACHE);
-            cache.then((c) => c.put(request, response.clone()));
+          if (!response || !response.ok) {
+            return response;
           }
+          const responseToCache = response.clone();
+          caches.open(API_CACHE).then((cache) => {
+            cache.put(request, responseToCache);
+          });
           return response;
         })
         .catch(() => {
@@ -81,8 +84,10 @@ self.addEventListener('fetch', (event) => {
             return response;
           }
 
-          const cache = caches.open(RUNTIME_CACHE);
-          cache.then((c) => c.put(request, response.clone()));
+          const responseToCache = response.clone();
+          caches.open(RUNTIME_CACHE).then((cache) => {
+            cache.put(request, responseToCache);
+          });
           return response;
         });
       })
@@ -94,10 +99,13 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        if (response.ok) {
-          const cache = caches.open(RUNTIME_CACHE);
-          cache.then((c) => c.put(request, response.clone()));
+        if (!response || !response.ok) {
+          return response;
         }
+        const responseToCache = response.clone();
+        caches.open(RUNTIME_CACHE).then((cache) => {
+          cache.put(request, responseToCache);
+        });
         return response;
       })
       .catch(() => {
@@ -116,8 +124,6 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: event.data.text(),
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),

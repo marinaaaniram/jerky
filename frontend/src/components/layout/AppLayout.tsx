@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { AppShell, Burger, Group, Title, Button, Text, ActionIcon, Tooltip, Stack, useMantineColorScheme } from '@mantine/core';
+import { AppShell, Burger, Group, Title, Button, Text, ActionIcon, Tooltip, Stack } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
@@ -13,8 +13,6 @@ import {
   IconClipboardList,
   IconChartBar,
   IconLogout,
-  IconMoon,
-  IconSun,
 } from '@tabler/icons-react';
 
 export function AppLayout() {
@@ -22,8 +20,7 @@ export function AppLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const location = useLocation();
-  const isMobile = useMediaQuery('(max-width: 768px)');
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const isMobile = useMediaQuery('(max-width: 768px)') || false;
 
   const handleLogout = () => {
     logout();
@@ -50,7 +47,7 @@ export function AppLayout() {
               order={3}
               size={isMobile ? 'h4' : 'h3'}
               fw={700}
-              sx={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer' }}
               onClick={() => {
                 navigate('/');
                 if (isMobile) close();
@@ -64,18 +61,6 @@ export function AppLayout() {
 
           <Group gap="xs" h="100%" wrap="nowrap">
             <PWAInstallButton />
-
-            <Tooltip label={colorScheme === 'dark' ? 'Светлый режим' : 'Тёмный режим'}>
-              <ActionIcon
-                onClick={() => toggleColorScheme()}
-                variant="subtle"
-                color="gray"
-                hiddenFrom="sm"
-                aria-label="Переключить тему"
-              >
-                {colorScheme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
-              </ActionIcon>
-            </Tooltip>
 
             <Text
               size="sm"
@@ -130,7 +115,6 @@ function NavbarLinks({
 }) {
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { colorScheme } = useMantineColorScheme();
 
   const links: NavbarLink[] = [
     { label: 'Панель управления', path: '/', icon: <IconDashboard size={20} />, roles: null },
@@ -184,7 +168,6 @@ function NavbarLinks({
               radius="md"
               aria-label={link.label}
               title={link.label}
-              fullWidth
             >
               {link.icon}
             </ActionIcon>

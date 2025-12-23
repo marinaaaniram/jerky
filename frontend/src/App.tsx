@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { MantineProvider, useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from './features/auth/LoginPage';
@@ -44,7 +44,7 @@ function App() {
   return (
     <MantineProvider
       theme={theme}
-      defaultColorScheme="auto"
+      defaultColorScheme="light"
     >
       <Notifications />
       <QueryClientProvider client={queryClient}>
