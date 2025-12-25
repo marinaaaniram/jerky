@@ -20,6 +20,9 @@ import { CustomerReportPage } from './features/analytics/pages/CustomerReportPag
 import { ProductReportPage } from './features/analytics/pages/ProductReportPage';
 import { StockReportPage } from './features/analytics/pages/StockReportPage';
 import { OrderStatusReportPage } from './features/analytics/pages/OrderStatusReportPage';
+import { UsersPage } from './features/users/pages/UsersPage';
+import { CreateUserPage } from './features/users/pages/CreateUserPage';
+import { UserDetailsPage } from './features/users/pages/UserDetailsPage';
 import { AppLayout } from './components/layout/AppLayout';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { useAuthStore } from './store/authStore';
@@ -79,6 +82,9 @@ function App() {
               <Route path="/analytics/products" element={<ProductReportPage />} />
               <Route path="/analytics/stock" element={<StockReportPage />} />
               <Route path="/analytics/orders" element={<OrderStatusReportPage />} />
+              <Route path="/users" element={<UsersPage />} />
+              <Route path="/users/new" element={<CreateUserPage />} />
+              <Route path="/users/:id" element={<UserDetailsPage />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

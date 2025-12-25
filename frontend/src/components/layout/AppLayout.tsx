@@ -14,6 +14,7 @@ import {
   IconPackage,
   IconClipboardList,
   IconChartBar,
+  IconUserCog,
 } from '@tabler/icons-react';
 
 export function AppLayout() {
@@ -125,6 +126,12 @@ function NavbarLinks({
       path: '/analytics/sales',
       icon: <IconChartBar size={20} />,
       roles: ['Руководитель', 'Менеджер по продажам'],
+    },
+    {
+      label: 'Управление пользователями',
+      path: '/users',
+      icon: <IconUserCog size={20} />,
+      roles: ['Руководитель'],
     },
   ];
 

@@ -1,14 +1,17 @@
 import type { Order, Product, Customer, OrderStatus } from '../types';
+import { OrderStatus as OrderStatusEnum } from '../types';
 
 /**
- * Calculate total revenue from all orders
+ * Calculate total revenue from delivered orders only
  */
 export const calculateTotalRevenue = (orders: Order[]): number => {
   if (!orders) return 0;
-  return orders.reduce((sum, order) => {
-    const orderTotal = order.orderItems.reduce((itemSum, item) => itemSum + item.price * item.quantity, 0);
-    return sum + orderTotal;
-  }, 0);
+  return orders
+    .filter((order) => order.status === OrderStatusEnum.DELIVERED)
+    .reduce((sum, order) => {
+      const orderTotal = order.orderItems.reduce((itemSum, item) => itemSum + item.price * item.quantity, 0);
+      return sum + orderTotal;
+    }, 0);
 };
 
 /**
@@ -22,12 +25,14 @@ export const calculateConsignmentDebt = (customers: Customer[]): number => {
 };
 
 /**
- * Calculate average order value
+ * Calculate average order value from delivered orders only
  */
 export const calculateAverageOrderValue = (orders: Order[]): number => {
   if (!orders || orders.length === 0) return 0;
+  const deliveredOrders = orders.filter((order) => order.status === OrderStatusEnum.DELIVERED);
+  if (deliveredOrders.length === 0) return 0;
   const revenue = calculateTotalRevenue(orders);
-  return revenue / orders.length;
+  return revenue / deliveredOrders.length;
 };
 
 /**

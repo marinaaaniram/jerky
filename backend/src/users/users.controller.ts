@@ -48,6 +48,18 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @Patch(':id/deactivate')
+  @Roles('Руководитель')
+  async deactivate(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.update(id, { isActive: false });
+  }
+
+  @Patch(':id/activate')
+  @Roles('Руководитель')
+  async activate(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.update(id, { isActive: true });
+  }
+
   @Delete(':id')
   @Roles('Руководитель')
   async remove(@Param('id', ParseIntPipe) id: number) {
