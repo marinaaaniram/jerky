@@ -29,12 +29,21 @@ const statusColors: Record<string, string> = {
   [OrderStatus.DELIVERED]: 'green',
 };
 
-const statusOptions = [
-  { value: OrderStatus.NEW, label: OrderStatus.NEW },
-  { value: OrderStatus.ASSEMBLING, label: OrderStatus.ASSEMBLING },
-  { value: OrderStatus.TRANSFERRED, label: OrderStatus.TRANSFERRED },
-  { value: OrderStatus.DELIVERED, label: OrderStatus.DELIVERED },
-];
+// Linear status transitions
+const getAvailableStatusOptions = (currentStatus: OrderStatus) => {
+  const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+    [OrderStatus.NEW]: [OrderStatus.ASSEMBLING],
+    [OrderStatus.ASSEMBLING]: [OrderStatus.TRANSFERRED],
+    [OrderStatus.TRANSFERRED]: [OrderStatus.DELIVERED],
+    [OrderStatus.DELIVERED]: [],
+  };
+
+  const nextStatuses = validTransitions[currentStatus] || [];
+  return [
+    { value: currentStatus, label: currentStatus }, // Current status
+    ...nextStatuses.map(status => ({ value: status, label: status })),
+  ];
+};
 
 export function OrderDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -153,6 +162,17 @@ export function OrderDetailsPage() {
                   <Text>{order.notes}</Text>
                 </div>
               )}
+
+              {order.user && (
+                <div>
+                  <Text size="sm" c="dimmed">
+                    Курьер
+                  </Text>
+                  <Text size="lg">
+                    {order.user.firstName} {order.user.lastName}
+                  </Text>
+                </div>
+              )}
             </Stack>
           </Card>
         </Grid.Col>
@@ -212,20 +232,23 @@ export function OrderDetailsPage() {
       {canChangeStatus() && (
         <Card shadow="sm" padding="lg" mb="xl">
           <Title order={3} mb="md">
-            Управление статусом
+            Статус заказа
           </Title>
           <Group>
             <Select
-              data={statusOptions}
+              data={getAvailableStatusOptions(order.status)}
               value={order.status}
               onChange={handleStatusChange}
-              disabled={updateStatus.isPending}
+              disabled={updateStatus.isPending || isDelivered}
               style={{ minWidth: 200 }}
             />
             {isDelivered && order.deliverySurvey && (
               <Badge color="green">Анкета заполнена</Badge>
             )}
           </Group>
+          <Text size="sm" c="dimmed" mt="md">
+            Для управления статусом заказа используйте Панель доставки
+          </Text>
         </Card>
       )}
 

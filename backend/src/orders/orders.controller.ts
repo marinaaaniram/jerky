@@ -13,6 +13,7 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { AddItemDto } from './dto/add-item.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { AssignCourierDto } from './dto/assign-courier.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -53,12 +54,22 @@ export class OrdersController {
   }
 
   @Patch(':id/status')
-  @Roles('Руководитель', 'Кладовщик', 'Курьер')
+  @Roles('Руководитель', 'Кладовщик', 'Менеджер по продажам', 'Курьер')
   async updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStatusDto: UpdateStatusDto,
+    @CurrentUser() user: User,
   ) {
-    return this.ordersService.updateStatus(id, updateStatusDto);
+    return this.ordersService.updateStatus(id, updateStatusDto, user);
+  }
+
+  @Patch(':id/assign-courier')
+  @Roles('Руководитель', 'Кладовщик', 'Менеджер по продажам')
+  async assignCourier(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() assignCourierDto: AssignCourierDto,
+  ) {
+    return this.ordersService.assignCourier(id, assignCourierDto);
   }
 
   @Get(':id/total')

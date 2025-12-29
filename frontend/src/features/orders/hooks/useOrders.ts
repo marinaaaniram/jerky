@@ -97,3 +97,28 @@ export const useOrderTotal = (orderId: number) => {
     enabled: !!orderId,
   });
 };
+
+export const useAssignCourier = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ orderId, userId }: { orderId: number; userId: number }) =>
+      ordersAPI.assignCourier(orderId, userId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['orders', variables.orderId] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      notifications.show({
+        title: 'Успех',
+        message: 'Курьер назначен на заказ',
+        color: 'green',
+      });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        title: 'Ошибка',
+        message: error.response?.data?.message || 'Не удалось назначить курьера',
+        color: 'red',
+      });
+    },
+  });
+};

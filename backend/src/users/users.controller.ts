@@ -33,6 +33,11 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('couriers')
+  async findCouriers() {
+    return this.usersService.findCouriers();
+  }
+
   @Get(':id')
   @Roles('Руководитель')
   async findOne(@Param('id', ParseIntPipe) id: number) {

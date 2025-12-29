@@ -9,6 +9,7 @@ import { Product } from '../products/entities/product.entity';
 import { PriceRule } from '../price-rules/entities/price-rule.entity';
 import { StockMovement } from '../stock-movements/entities/stock-movement.entity';
 import { DeliverySurvey } from '../delivery-surveys/entities/delivery-survey.entity';
+import { User } from '../users/entities/user.entity';
 import { CustomersModule } from '../customers/customers.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { CustomersModule } from '../customers/customers.module';
       PriceRule,
       StockMovement,
       DeliverySurvey,
+      User,
     ]),
     CustomersModule,
   ],

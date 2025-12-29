@@ -13,6 +13,8 @@ interface AuthState {
   canEdit: () => boolean;
   canManageStock: () => boolean;
   canChangeStatus: () => boolean;
+  isCourier: () => boolean;
+  isNotCourier: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -69,6 +71,16 @@ export const useAuthStore = create<AuthState>()(
       canChangeStatus: () => {
         const { hasPermission } = get();
         return hasPermission(['Руководитель', 'Кладовщик', 'Курьер']);
+      },
+
+      isCourier: () => {
+        const { hasPermission } = get();
+        return hasPermission(['Курьер']);
+      },
+
+      isNotCourier: () => {
+        const { isCourier } = get();
+        return !isCourier();
       },
     }),
     {

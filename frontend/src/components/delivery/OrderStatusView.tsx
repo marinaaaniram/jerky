@@ -1,7 +1,11 @@
-import { Card, Stack, Text, Badge, Group, Progress, Divider } from '@mantine/core';
-import { IconMapPin, IconUser, IconPackage, IconTruck, IconCheck } from '@tabler/icons-react';
+import { Card, Stack, Text, Badge, Group, Progress, Divider, Button, Select } from '@mantine/core';
+import { IconMapPin, IconUser, IconPackage, IconTruck, IconCheck, IconArrowRight } from '@tabler/icons-react';
 import type { Order } from '../../types';
 import { OrderStatus } from '../../types';
+import { useUpdateOrderStatus, useAssignCourier } from '../../features/orders/hooks/useOrders';
+import { useCouriers } from '../../features/users/hooks/useUsers';
+import { useAuthStore } from '../../store/authStore';
+import { notifications } from '@mantine/notifications';
 
 interface OrderStatusViewProps {
   order: Order;
@@ -18,6 +22,20 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
   const orderDate = new Date(order.orderDate).toLocaleDateString('ru-RU');
   const currentStatusIndex = statusSteps.findIndex(step => step.status === order.status);
   const progress = ((currentStatusIndex + 1) / statusSteps.length) * 100;
+  const updateStatus = useUpdateOrderStatus();
+  const assignCourier = useAssignCourier();
+  const { data: couriers } = useCouriers();
+  const { isNotCourier } = useAuthStore();
+
+  const isNew = order.status === OrderStatus.NEW;
+  const isAssembling = order.status === OrderStatus.ASSEMBLING;
+  const hasItems = order.orderItems && order.orderItems.length > 0;
+  // Linear logic: can only start assembling from NEW status
+  const canStartAssembling = isNotCourier() && isNew;
+  // Can assign courier only to NEW or ASSEMBLING orders
+  const canAssignCourier = isNotCourier() && (isNew || isAssembling);
+  // Can transfer to courier only from ASSEMBLING status and if courier is assigned
+  const canTransferToCourier = isNotCourier() && isAssembling && order.userId;
 
   const getStatusColor = (status: string) => {
     const statusMap: Record<string, string> = {
@@ -27,6 +45,43 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
       [OrderStatus.DELIVERED]: 'green',
     };
     return statusMap[status] || 'gray';
+  };
+
+  const handleStartAssembling = () => {
+    if (!hasItems) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Добавьте хотя бы одну позицию перед началом сборки',
+        color: 'red',
+      });
+      return;
+    }
+    updateStatus.mutate({ orderId: order.id, status: OrderStatus.ASSEMBLING });
+  };
+
+  const handleTransferToCourier = () => {
+    if (order.status !== OrderStatus.ASSEMBLING) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Заказ должен быть в статусе "В сборке"',
+        color: 'red',
+      });
+      return;
+    }
+    if (!order.userId) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Сначала назначьте курьера на заказ',
+        color: 'red',
+      });
+      return;
+    }
+    updateStatus.mutate({ orderId: order.id, status: OrderStatus.TRANSFERRED });
+  };
+
+  const handleAssignCourier = (userId: number | null) => {
+    if (!userId) return;
+    assignCourier.mutate({ orderId: order.id, userId });
   };
 
   return (
@@ -118,6 +173,56 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
           <Text span fw={500}>Товаров в заказе: </Text>
           {order.orderItems.length} {order.orderItems.length === 1 ? 'позиция' : 'позиций'}
         </Text>
+
+        {/* Управление статусом (для сотрудников кроме курьера) */}
+        {isNotCourier() && order.status !== OrderStatus.DELIVERED && (
+          <>
+            <Divider />
+            <Stack gap="sm">
+              {canStartAssembling && (
+                <Button
+                  onClick={handleStartAssembling}
+                  disabled={updateStatus.isPending || !hasItems}
+                  color="yellow"
+                  leftSection={<IconPackage size={18} />}
+                  fullWidth
+                >
+                  Начать сборку
+                </Button>
+              )}
+
+              {canAssignCourier && (
+                <div>
+                  <Text size="sm" fw={500} mb="xs">
+                    Назначить курьера
+                  </Text>
+                  <Select
+                    data={couriers?.map(c => ({
+                      value: c.id.toString(),
+                      label: `${c.firstName} ${c.lastName}`,
+                    })) || []}
+                    value={order.userId?.toString() || null}
+                    onChange={(value) => handleAssignCourier(value ? Number(value) : null)}
+                    placeholder="Выберите курьера"
+                    disabled={assignCourier.isPending}
+                  />
+                </div>
+              )}
+
+              {canTransferToCourier && (
+                <Button
+                  onClick={handleTransferToCourier}
+                  disabled={updateStatus.isPending}
+                  color="orange"
+                  leftSection={<IconArrowRight size={18} />}
+                  fullWidth
+                >
+                  Передан курьеру
+                </Button>
+              )}
+            </Stack>
+          </>
+        )}
       </Stack>
     </Card>
   );

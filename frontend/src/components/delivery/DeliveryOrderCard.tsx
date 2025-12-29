@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { Card, Stack, Text, Badge, Button, Group, Divider, Tooltip } from '@mantine/core';
 import { IconMapPin, IconCheck, IconPackage } from '@tabler/icons-react';
 import type { Order } from '../../types';
 import { OrderStatus } from '../../types';
 import { useUpdateOrderStatus } from '../../features/orders/hooks/useOrders';
+import { useAuthStore } from '../../store/authStore';
+import { notifications } from '@mantine/notifications';
+import { DeliverySurveyModal } from '../../features/orders/components/DeliverySurveyModal';
 
 interface DeliveryOrderCardProps {
   order: Order;
@@ -13,12 +17,50 @@ const WAREHOUSE_ADDRESS = 'Склад: ул. Складская, д. 1';
 
 export function DeliveryOrderCard({ order }: DeliveryOrderCardProps) {
   const updateStatus = useUpdateOrderStatus();
+  const { user } = useAuthStore();
+  const [surveyModalOpened, setSurveyModalOpened] = useState(false);
   const customerAddress = order.customer.address || 'Адрес не указан';
   const orderDate = new Date(order.orderDate).toLocaleDateString('ru-RU');
   const itemsCount = order.orderItems.length;
 
+  const isTransferred = order.status === OrderStatus.TRANSFERRED;
+  const isAssignedToCurrentUser = order.userId === user?.id;
+  const canMarkDelivered = isTransferred && isAssignedToCurrentUser;
+
   const handleDeliver = () => {
+    // Check if order is in TRANSFERRED status
+    if (!isTransferred) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Заказ должен быть в статусе "Передан курьеру"',
+        color: 'red',
+      });
+      return;
+    }
+
+    // Check if current user is the assigned courier
+    if (!isAssignedToCurrentUser) {
+      notifications.show({
+        title: 'Ошибка',
+        message: 'Вы не являетесь назначенным курьером на этот заказ',
+        color: 'red',
+      });
+      return;
+    }
+
+    // If delivery survey is required, show modal
+    if (!order.deliverySurvey) {
+      setSurveyModalOpened(true);
+      return;
+    }
+
     updateStatus.mutate({ orderId: order.id, status: OrderStatus.DELIVERED });
+  };
+
+  const handleSurveySubmitted = () => {
+    // After survey is submitted, update status to DELIVERED
+    updateStatus.mutate({ orderId: order.id, status: OrderStatus.DELIVERED });
+    setSurveyModalOpened(false);
   };
 
   return (
@@ -71,19 +113,34 @@ export function DeliveryOrderCard({ order }: DeliveryOrderCardProps) {
         <Divider />
 
         {/* Действия */}
-        <Button
-          variant="filled"
-          color="green"
-          fullWidth
-          leftSection={<IconCheck size={18} />}
-          onClick={handleDeliver}
-          disabled={order.status === OrderStatus.DELIVERED}
-          loading={updateStatus.isPending}
-          size="md"
-        >
-          {order.status === OrderStatus.DELIVERED ? 'Доставлен' : 'Отметить как доставленный'}
-        </Button>
+        {canMarkDelivered && (
+          <Button
+            variant="filled"
+            color="green"
+            fullWidth
+            leftSection={<IconCheck size={18} />}
+            onClick={handleDeliver}
+            disabled={order.status === OrderStatus.DELIVERED}
+            loading={updateStatus.isPending}
+            size="md"
+          >
+            {order.status === OrderStatus.DELIVERED ? 'Доставлен' : 'Отметить как доставленный'}
+          </Button>
+        )}
+        
+        {!canMarkDelivered && order.status === OrderStatus.TRANSFERRED && (
+          <Text size="sm" c="dimmed" ta="center">
+            Заказ назначен другому курьеру
+          </Text>
+        )}
       </Stack>
+
+      <DeliverySurveyModal
+        opened={surveyModalOpened}
+        onClose={() => setSurveyModalOpened(false)}
+        orderId={order.id}
+        onSuccess={handleSurveySubmitted}
+      />
     </Card>
   );
 }

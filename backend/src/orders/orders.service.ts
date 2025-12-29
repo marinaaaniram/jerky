@@ -17,6 +17,8 @@ import { CustomerInteractionService } from '../customers/services/customer-inter
 import { CreateOrderDto } from './dto/create-order.dto';
 import { AddItemDto } from './dto/add-item.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { AssignCourierDto } from './dto/assign-courier.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
@@ -35,6 +37,8 @@ export class OrdersService {
     private stockMovementsRepository: Repository<StockMovement>,
     @InjectRepository(DeliverySurvey)
     private deliverySurveysRepository: Repository<DeliverySurvey>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     private dataSource: DataSource,
     private interactionService: CustomerInteractionService,
   ) {}
@@ -145,6 +149,7 @@ export class OrdersService {
   async updateStatus(
     orderId: number,
     updateStatusDto: UpdateStatusDto,
+    currentUser?: User,
   ): Promise<Order> {
     const order = await this.findOne(orderId);
 
@@ -152,13 +157,86 @@ export class OrdersService {
       throw new ForbiddenException('Cannot modify delivered orders');
     }
 
+    // Linear status transitions validation
+    const validTransitions: Record<OrderStatus, OrderStatus[]> = {
+      [OrderStatus.NEW]: [OrderStatus.ASSEMBLING],
+      [OrderStatus.ASSEMBLING]: [OrderStatus.TRANSFERRED],
+      [OrderStatus.TRANSFERRED]: [OrderStatus.DELIVERED],
+      [OrderStatus.DELIVERED]: [], // No transitions from DELIVERED
+    };
+
+    const allowedNextStatuses = validTransitions[order.status];
+    if (!allowedNextStatuses.includes(updateStatusDto.status)) {
+      throw new BadRequestException(
+        `Cannot transition from "${order.status}" to "${updateStatusDto.status}". ` +
+        `Valid next statuses: ${allowedNextStatuses.join(', ')}`,
+      );
+    }
+
     // If transitioning to DELIVERED, perform transaction
     if (updateStatusDto.status === OrderStatus.DELIVERED) {
+      // Check if current user is the assigned courier
+      if (currentUser && order.userId && order.userId !== currentUser.id) {
+        throw new ForbiddenException('Only the assigned courier can mark order as delivered');
+      }
+      // Check if order is in TRANSFERRED status (already validated above, but double-check)
+      if (order.status !== OrderStatus.TRANSFERRED) {
+        throw new BadRequestException('Order must be in "Передан курьеру" status before marking as delivered');
+      }
       return this.deliverOrder(orderId);
     }
 
-    // Simple status update for other statuses
+    // If transitioning to TRANSFERRED, check that courier is assigned
+    if (updateStatusDto.status === OrderStatus.TRANSFERRED) {
+      if (!order.userId) {
+        throw new BadRequestException('Courier must be assigned before transferring order');
+      }
+      // Check if order is in ASSEMBLING status (already validated above, but double-check)
+      if (order.status !== OrderStatus.ASSEMBLING) {
+        throw new BadRequestException('Order must be in "В сборке" status before transferring to courier');
+      }
+    }
+
+    // If transitioning to ASSEMBLING, check if order is in NEW status (already validated above)
+    if (updateStatusDto.status === OrderStatus.ASSEMBLING) {
+      if (order.status !== OrderStatus.NEW) {
+        throw new BadRequestException('Order must be in "Новый" status before starting assembly');
+      }
+    }
+
+    // Simple status update for valid transitions
     order.status = updateStatusDto.status;
+    return this.ordersRepository.save(order);
+  }
+
+  async assignCourier(
+    orderId: number,
+    assignCourierDto: AssignCourierDto,
+  ): Promise<Order> {
+    const order = await this.findOne(orderId);
+
+    // Can only assign courier to orders in NEW or ASSEMBLING status
+    if (order.status !== OrderStatus.NEW && order.status !== OrderStatus.ASSEMBLING) {
+      throw new BadRequestException(
+        'Courier can only be assigned to orders in "Новый" or "В сборке" status',
+      );
+    }
+
+    // Verify that the user is a courier (role name is "Курьер")
+    const user = await this.usersRepository.findOne({
+      where: { id: assignCourierDto.userId },
+      relations: ['role'],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${assignCourierDto.userId} not found`);
+    }
+
+    if (user.role.name !== 'Курьер') {
+      throw new BadRequestException('User must have "Курьер" role');
+    }
+
+    order.userId = assignCourierDto.userId;
     return this.ordersRepository.save(order);
   }
 

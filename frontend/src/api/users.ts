@@ -47,6 +47,11 @@ export const usersAPI = {
     const { data } = await apiClient.patch<User>(`/users/${id}/activate`);
     return data;
   },
+
+  getCouriers: async (): Promise<User[]> => {
+    const { data } = await apiClient.get<User[]>('/users/couriers');
+    return data;
+  },
 };
 
 export const rolesAPI = {

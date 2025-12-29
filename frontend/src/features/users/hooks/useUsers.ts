@@ -138,3 +138,10 @@ export const useActivateUser = () => {
   });
 };
 
+export const useCouriers = () => {
+  return useQuery({
+    queryKey: ['couriers'],
+    queryFn: usersAPI.getCouriers,
+  });
+};
+

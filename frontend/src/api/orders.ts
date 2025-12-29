@@ -50,4 +50,12 @@ export const ordersAPI = {
       total: Number(data.total),
     };
   },
+
+  assignCourier: async (
+    orderId: number,
+    userId: number
+  ): Promise<Order> => {
+    const { data } = await apiClient.patch<any>(`/orders/${orderId}/assign-courier`, { userId });
+    return transformOrder(data);
+  },
 };

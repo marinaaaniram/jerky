@@ -12,9 +12,9 @@ export function DeliveryPanel() {
   const isCourier = user?.role.name === 'Курьер';
 
   // Для курьера: заказы, которые нужно доставить
-  // Показываем все заказы со статусом "Передан курьеру"
+  // Показываем только заказы со статусом "Передан курьеру", назначенные на текущего курьера
   const courierOrders = orders?.filter(
-    (order) => order.status === OrderStatus.TRANSFERRED
+    (order) => order.status === OrderStatus.TRANSFERRED && order.userId === user?.id
   ) || [];
 
   // Для остальных: все заказы, отсортированные по статусу

@@ -5,12 +5,15 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Role } from '../roles/entities/role.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Role)
+    private rolesRepository: Repository<Role>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -34,6 +37,24 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({
+      relations: ['role'],
+    });
+  }
+
+  async findCouriers(): Promise<User[]> {
+    const courierRole = await this.rolesRepository.findOne({
+      where: { name: 'Курьер' },
+    });
+
+    if (!courierRole) {
+      return [];
+    }
+
+    return this.usersRepository.find({
+      where: {
+        roleId: courierRole.id,
+        isActive: true,
+      },
       relations: ['role'],
     });
   }
