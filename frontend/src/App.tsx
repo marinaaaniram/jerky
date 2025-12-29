@@ -4,6 +4,7 @@ import { Notifications } from '@mantine/notifications';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from './features/auth/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { HomePage } from './pages/HomePage';
 import { OrdersPage } from './features/orders/pages/OrdersPage';
 import { OrderDetailsPage } from './features/orders/pages/OrderDetailsPage';
 import { CreateOrderPage } from './features/orders/pages/CreateOrderPage';
@@ -65,7 +66,8 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route path="/" element={<DashboardPage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/dashboards" element={<DashboardPage />} />
               <Route path="/orders" element={<OrdersPage />} />
               <Route path="/orders/new" element={<CreateOrderPage />} />
               <Route path="/orders/:id" element={<OrderDetailsPage />} />

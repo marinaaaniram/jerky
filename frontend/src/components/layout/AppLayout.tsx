@@ -101,7 +101,7 @@ function NavbarLinks({
   const { user } = useAuthStore();
 
   const links: NavbarLink[] = [
-    { label: 'Панель управления', path: '/', icon: <IconDashboard size={20} />, roles: null },
+    { label: 'Панель управления', path: '/dashboards', icon: <IconDashboard size={20} />, roles: null },
     { label: 'Заказы', path: '/orders', icon: <IconShoppingCart size={20} />, roles: null },
     {
       label: 'Клиенты',
