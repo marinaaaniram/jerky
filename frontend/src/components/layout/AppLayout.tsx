@@ -7,6 +7,7 @@ import { GlobalSearch } from '../GlobalSearch';
 import { PWAInstallButton } from '../PWAInstallButton';
 import { UserAvatar } from '../UserAvatar';
 import { MobileSearch } from '../MobileSearch';
+import { ActiveOrderIndicator } from '../delivery/ActiveOrderIndicator';
 import {
   IconDashboard,
   IconShoppingCart,
@@ -78,6 +79,7 @@ export function AppLayout() {
 
       <AppShell.Main>
         <Outlet />
+        <ActiveOrderIndicator />
       </AppShell.Main>
     </AppShell>
   );

@@ -89,7 +89,12 @@ function App() {
               <Route path="/users/:id" element={<UserDetailsPage />} />
             </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route 
+              path="*" 
+              element={
+                isAuthenticated ? <Navigate to="/" replace /> : <Navigate to="/login" replace />
+              } 
+            />
           </Routes>
         </BrowserRouter>
       </QueryClientProvider>

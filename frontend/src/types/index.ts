@@ -67,6 +67,8 @@ export interface Order {
   id: number;
   customerId: number;
   customer: Customer;
+  userId?: number;
+  user?: User;
   orderDate: Date;
   status: OrderStatus;
   notes?: string;

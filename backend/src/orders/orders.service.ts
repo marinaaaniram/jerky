@@ -72,7 +72,7 @@ export class OrdersService {
 
   async findAll(): Promise<Order[]> {
     return this.ordersRepository.find({
-      relations: ['customer', 'orderItems', 'orderItems.product'],
+      relations: ['customer', 'user', 'orderItems', 'orderItems.product'],
       order: {
         createdAt: 'DESC',
       },
@@ -82,7 +82,7 @@ export class OrdersService {
   async findOne(id: number): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
-      relations: ['customer', 'orderItems', 'orderItems.product', 'deliverySurvey'],
+      relations: ['customer', 'user', 'orderItems', 'orderItems.product', 'deliverySurvey'],
     });
 
     if (!order) {

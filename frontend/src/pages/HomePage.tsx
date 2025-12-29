@@ -1,10 +1,6 @@
-import { Container } from '@mantine/core';
+import { DeliveryPanel } from '../components/delivery/DeliveryPanel';
 
 export function HomePage() {
-  return (
-    <Container size="xl">
-      {/* Пустая главная страница */}
-    </Container>
-  );
+  return <DeliveryPanel />;
 }
 
