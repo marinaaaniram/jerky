@@ -40,8 +40,8 @@ export function OrdersPage() {
   ];
 
   return (
-    <Container size="xl" pt={0} py={0} mt={0}>
-      <Group justify="space-between" mb="xl" mt={0}>
+    <Container size="xl">
+      <Group justify="space-between" mb="xl">
         <Title order={2}>Заказы</Title>
         <Button onClick={() => navigate('/orders/new')}>Создать заказ</Button>
       </Group>
