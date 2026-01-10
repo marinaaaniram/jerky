@@ -31,18 +31,36 @@ jerky-v2/
 
 ## Быстрый старт
 
-### С помощью Docker (рекомендуется)
+### Локальная разработка (Docker)
+
+Используйте **docker-compose.yml** для разработки с горячей перезагрузкой (hot reload):
 
 ```bash
-# Запустить все сервисы
+# Запустить контейнеры
 docker-compose up --build
 
-# Backend будет доступен на http://localhost:3000
-# Frontend будет доступен на http://localhost:5173
-# PostgreSQL на localhost:5432
+# Доступ:
+# Frontend:     http://localhost:5173
+# Backend API:  http://localhost:3000
+# PostgreSQL:   localhost:5432
 ```
 
-### Локальная разработка
+✅ При изменении кода в `src/` папках контейнеры автоматически перезагружаются
+
+### Production сервер
+
+Используйте **docker-compose.prod.yml** для оптимизированной production сборки:
+
+```bash
+# На сервере
+docker-compose -f docker-compose.prod.yml up --build -d
+
+# Доступ:
+# Frontend:     http://95.81.102.27 (или ваш IP)
+# Backend API:  http://95.81.102.27:3000
+```
+
+### Локальная разработка (без Docker)
 
 #### Backend
 
@@ -78,6 +96,16 @@ npm install
 # Запустить в режиме разработки
 npm run dev
 ```
+
+---
+
+## Развертывание
+
+**Полная инструкция** в файле [DEPLOYMENT.md](./DEPLOYMENT.md):
+- Пошаговые команды для dev и prod
+- Как обновлять код на сервере
+- Решение проблем (troubleshooting)
+- Backup база данных
 
 ## Работа с базой данных (TypeORM)
 
