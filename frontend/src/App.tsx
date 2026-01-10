@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
@@ -44,6 +45,28 @@ const queryClient = new QueryClient({
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const set = useAuthStore((state) => state.login); // Get the set state function
+
+  useEffect(() => {
+    // Initialize auth state from localStorage on app load
+    const token = localStorage.getItem('access_token');
+    const userStr = localStorage.getItem('user');
+
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        useAuthStore.setState({
+          user,
+          token,
+          isAuthenticated: true,
+        });
+      } catch {
+        // If parsing fails, clear localStorage
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   return (
     <MantineProvider
