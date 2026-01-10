@@ -1,5 +1,5 @@
-# Development environment - with Vite hot reload
-# Usage: docker-compose up --build
+# Production environment - optimized for servers
+# Usage: docker-compose -f docker-compose.prod.yml up --build
 
 services:
   postgres:
@@ -20,6 +20,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   backend:
     build:
@@ -33,7 +34,7 @@ services:
       DATABASE_USER: jerky_user
       DATABASE_PASSWORD: jerky_password
       JWT_SECRET: your-secret-key-change-in-production
-      NODE_ENV: development
+      NODE_ENV: production
     ports:
       - "3000:3000"
     depends_on:
@@ -41,26 +42,21 @@ services:
         condition: service_healthy
     networks:
       - jerky-network
-    volumes:
-      - ./backend/src:/app/src
-      - ./backend/uploads:/app/uploads
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     container_name: jerky-frontend
     ports:
-      - "5173:5173"
+      - "80:80"
+      - "443:443"
     depends_on:
       - backend
     networks:
       - jerky-network
-    environment:
-      VITE_API_URL: http://backend:3000
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/node_modules:/app/node_modules
+    restart: unless-stopped
 
 volumes:
   postgres_data:

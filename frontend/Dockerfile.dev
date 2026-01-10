@@ -1,0 +1,14 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+# Expose port for Vite dev server
+EXPOSE 5173
+
+# Run Vite dev server (host and port configured in vite.config.ts)
+CMD ["npm", "run", "dev"]
