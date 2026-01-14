@@ -3,6 +3,7 @@ import { IconArrowRight } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { Order } from '../../../types';
 import { OrderStatus } from '../../../types';
+import { TransferWithCourierModal } from './TransferWithCourierModal';
 
 interface KanbanOrderCardProps {
   order: Order;
@@ -20,6 +21,7 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 export function KanbanOrderCard({ order, onView, onStatusChange }: KanbanOrderCardProps) {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<OrderStatus | null>(null);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
 
   const orderDate = new Date(order.orderDate).toLocaleDateString('ru-RU');
   const total = order.orderItems.reduce(
@@ -49,8 +51,13 @@ export function KanbanOrderCard({ order, onView, onStatusChange }: KanbanOrderCa
     e.stopPropagation();
     const nextStatus = getNextStatus();
     if (nextStatus) {
-      setPendingStatus(nextStatus);
-      setIsConfirmOpen(true);
+      // If moving to TRANSFERRED, open courier selection modal instead of confirmation
+      if (nextStatus === OrderStatus.TRANSFERRED) {
+        setIsTransferModalOpen(true);
+      } else {
+        setPendingStatus(nextStatus);
+        setIsConfirmOpen(true);
+      }
     }
   };
 
@@ -154,6 +161,16 @@ export function KanbanOrderCard({ order, onView, onStatusChange }: KanbanOrderCa
           </Group>
         </Stack>
       </Modal>
+
+      <TransferWithCourierModal
+        opened={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        order={order}
+        onSuccess={() => {
+          setIsTransferModalOpen(false);
+          // The mutations in TransferWithCourierModal will refresh the data
+        }}
+      />
     </>
   );
 }

@@ -20,6 +20,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { OrderStatus } from '../../../types';
 import type { Order } from '../../../types';
 import { KanbanOrderCard } from './KanbanOrderCard';
+import { TransferWithCourierModal } from './TransferWithCourierModal';
 
 interface KanbanColumnProps {
   id: string;
@@ -279,6 +280,8 @@ function KanbanBoardMobile({
 export function KanbanBoard({ orders, onView, onStatusChange }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [orderForTransfer, setOrderForTransfer] = useState<Order | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const sensors = useSensors(
@@ -348,6 +351,13 @@ export function KanbanBoard({ orders, onView, onStatusChange }: KanbanBoardProps
       return;
     }
 
+    // If transitioning to TRANSFERRED, open courier selection modal instead
+    if (newStatus === OrderStatus.TRANSFERRED) {
+      setOrderForTransfer(order);
+      setIsTransferModalOpen(true);
+      return;
+    }
+
     setIsUpdating(true);
     try {
       await onStatusChange(orderId, newStatus);
@@ -359,27 +369,40 @@ export function KanbanBoard({ orders, onView, onStatusChange }: KanbanBoardProps
   const activeOrder = activeId ? orders.find((o) => o.id.toString() === activeId) : null;
 
   return (
-    <Container size="xl" style={{ position: 'relative' }}>
-      {isMobile ? (
-        <KanbanBoardMobile
-          orders={orders}
-          onView={onView}
-          onStatusChange={onStatusChange}
-          isUpdating={isUpdating}
-        />
-      ) : (
-        <KanbanBoardDesktop
-          orders={orders}
-          onView={onView}
-          onStatusChange={onStatusChange}
-          isUpdating={isUpdating}
-          activeOrder={activeOrder}
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
+    <>
+      <Container size="xl" style={{ position: 'relative' }}>
+        {isMobile ? (
+          <KanbanBoardMobile
+            orders={orders}
+            onView={onView}
+            onStatusChange={onStatusChange}
+            isUpdating={isUpdating}
+          />
+        ) : (
+          <KanbanBoardDesktop
+            orders={orders}
+            onView={onView}
+            onStatusChange={onStatusChange}
+            isUpdating={isUpdating}
+            activeOrder={activeOrder}
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          />
+        )}
+      </Container>
+
+      {orderForTransfer && (
+        <TransferWithCourierModal
+          opened={isTransferModalOpen}
+          onClose={() => {
+            setIsTransferModalOpen(false);
+            setOrderForTransfer(null);
+          }}
+          order={orderForTransfer}
         />
       )}
-    </Container>
+    </>
   );
 }
 

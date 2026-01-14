@@ -1,11 +1,13 @@
 import { Card, Stack, Text, Badge, Group, Progress, Divider, Button, Select } from '@mantine/core';
 import { IconMapPin, IconUser, IconPackage, IconTruck, IconCheck, IconArrowRight } from '@tabler/icons-react';
+import { useState } from 'react';
 import type { Order } from '../../types';
 import { OrderStatus } from '../../types';
 import { useUpdateOrderStatus, useAssignCourier } from '../../features/orders/hooks/useOrders';
 import { useCouriers } from '../../features/users/hooks/useUsers';
 import { useAuthStore } from '../../store/authStore';
 import { notifications } from '@mantine/notifications';
+import { TransferWithCourierModal } from '../../features/orders/components/TransferWithCourierModal';
 
 interface OrderStatusViewProps {
   order: Order;
@@ -19,6 +21,8 @@ const statusSteps = [
 ];
 
 export function OrderStatusView({ order }: OrderStatusViewProps) {
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+
   const orderDate = new Date(order.orderDate).toLocaleDateString('ru-RU');
   const currentStatusIndex = statusSteps.findIndex(step => step.status === order.status);
   const progress = ((currentStatusIndex + 1) / statusSteps.length) * 100;
@@ -34,8 +38,8 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
   const canStartAssembling = isNotCourier() && isNew;
   // Can assign courier only to NEW or ASSEMBLING orders
   const canAssignCourier = isNotCourier() && (isNew || isAssembling);
-  // Can transfer to courier only from ASSEMBLING status and if courier is assigned
-  const canTransferToCourier = isNotCourier() && isAssembling && order.userId;
+  // Can transfer to courier only from ASSEMBLING status (courier will be selected in modal)
+  const canTransferToCourier = isNotCourier() && isAssembling;
 
   const getStatusColor = (status: string) => {
     const statusMap: Record<string, string> = {
@@ -68,15 +72,8 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
       });
       return;
     }
-    if (!order.userId) {
-      notifications.show({
-        title: 'Ошибка',
-        message: 'Сначала назначьте курьера на заказ',
-        color: 'red',
-      });
-      return;
-    }
-    updateStatus.mutate({ orderId: order.id, status: OrderStatus.TRANSFERRED });
+    // Open modal to select courier (courier assignment and status update will happen in modal)
+    setIsTransferModalOpen(true);
   };
 
   const handleAssignCourier = (userId: number | null) => {
@@ -224,6 +221,13 @@ export function OrderStatusView({ order }: OrderStatusViewProps) {
           </>
         )}
       </Stack>
+
+      {/* Transfer with courier selection modal */}
+      <TransferWithCourierModal
+        opened={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        order={order}
+      />
     </Card>
   );
 }

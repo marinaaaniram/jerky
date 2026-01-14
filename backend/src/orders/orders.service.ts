@@ -50,13 +50,12 @@ export class OrdersService {
 
     if (!customer) {
       throw new NotFoundException(
-        `Customer with ID ${createOrderDto.customerId} not found`,
+        `Клиент с ID ${createOrderDto.customerId} не найден`,
       );
     }
 
     const order = this.ordersRepository.create({
       customerId: createOrderDto.customerId,
-      userId,
       orderDate: new Date(),
       status: OrderStatus.NEW,
       notes: createOrderDto.notes,
@@ -90,7 +89,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException(`Order with ID ${id} not found`);
+      throw new NotFoundException(`Заказ с ID ${id} не найден`);
     }
 
     return order;
@@ -100,7 +99,7 @@ export class OrdersService {
     const order = await this.findOne(orderId);
 
     if (order.status === OrderStatus.DELIVERED) {
-      throw new ForbiddenException('Cannot modify delivered orders');
+      throw new ForbiddenException('Нельзя изменять доставленные заказы');
     }
 
     const product = await this.productsRepository.findOne({
@@ -109,7 +108,7 @@ export class OrdersService {
 
     if (!product) {
       throw new NotFoundException(
-        `Product with ID ${addItemDto.productId} not found`,
+        `Товар с ID ${addItemDto.productId} не найден`,
       );
     }
 
@@ -154,7 +153,7 @@ export class OrdersService {
     const order = await this.findOne(orderId);
 
     if (order.status === OrderStatus.DELIVERED) {
-      throw new ForbiddenException('Cannot modify delivered orders');
+      throw new ForbiddenException('Нельзя изменять доставленные заказы');
     }
 
     // Linear status transitions validation
@@ -168,8 +167,8 @@ export class OrdersService {
     const allowedNextStatuses = validTransitions[order.status];
     if (!allowedNextStatuses.includes(updateStatusDto.status)) {
       throw new BadRequestException(
-        `Cannot transition from "${order.status}" to "${updateStatusDto.status}". ` +
-        `Valid next statuses: ${allowedNextStatuses.join(', ')}`,
+        `Невозможно перейти из "${order.status}" в "${updateStatusDto.status}". ` +
+        `Допустимые статусы: ${allowedNextStatuses.join(', ')}`,
       );
     }
 
@@ -177,11 +176,11 @@ export class OrdersService {
     if (updateStatusDto.status === OrderStatus.DELIVERED) {
       // Check if current user is the assigned courier
       if (currentUser && order.userId && order.userId !== currentUser.id) {
-        throw new ForbiddenException('Only the assigned courier can mark order as delivered');
+        throw new ForbiddenException('Только назначенный курьер может отметить заказ как доставленный');
       }
       // Check if order is in TRANSFERRED status (already validated above, but double-check)
       if (order.status !== OrderStatus.TRANSFERRED) {
-        throw new BadRequestException('Order must be in "Передан курьеру" status before marking as delivered');
+        throw new BadRequestException('Заказ должен быть в статусе "Передан курьеру" перед отметкой как доставленный');
       }
       return this.deliverOrder(orderId);
     }
@@ -189,18 +188,18 @@ export class OrdersService {
     // If transitioning to TRANSFERRED, check that courier is assigned
     if (updateStatusDto.status === OrderStatus.TRANSFERRED) {
       if (!order.userId) {
-        throw new BadRequestException('Courier must be assigned before transferring order');
+        throw new BadRequestException('Курьер должен быть назначен перед передачей заказа');
       }
       // Check if order is in ASSEMBLING status (already validated above, but double-check)
       if (order.status !== OrderStatus.ASSEMBLING) {
-        throw new BadRequestException('Order must be in "В сборке" status before transferring to courier');
+        throw new BadRequestException('Заказ должен быть в статусе "В сборке" перед передачей курьеру');
       }
     }
 
     // If transitioning to ASSEMBLING, check if order is in NEW status (already validated above)
     if (updateStatusDto.status === OrderStatus.ASSEMBLING) {
       if (order.status !== OrderStatus.NEW) {
-        throw new BadRequestException('Order must be in "Новый" status before starting assembly');
+        throw new BadRequestException('Заказ должен быть в статусе "Новый" перед началом сборки');
       }
     }
 
@@ -229,11 +228,11 @@ export class OrdersService {
     });
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${assignCourierDto.userId} not found`);
+      throw new NotFoundException(`Пользователь с ID ${assignCourierDto.userId} не найден`);
     }
 
     if (user.role.name !== 'Курьер') {
-      throw new BadRequestException('User must have "Курьер" role');
+      throw new BadRequestException('Пользователь должен иметь роль "Курьер"');
     }
 
     order.userId = assignCourierDto.userId;
@@ -252,7 +251,7 @@ export class OrdersService {
       });
 
       if (!order) {
-        throw new NotFoundException(`Order with ID ${orderId} not found`);
+        throw new NotFoundException(`Заказ с ID ${orderId} не найден`);
       }
 
       // Check if delivery survey exists
@@ -262,7 +261,7 @@ export class OrdersService {
 
       if (!deliverySurvey) {
         throw new BadRequestException(
-          'Delivery survey is required before marking order as delivered',
+          'Анкета доставки требуется перед отметкой заказа как доставленного',
         );
       }
 
@@ -288,7 +287,7 @@ export class OrdersService {
 
         if (product.stockQuantity < item.quantity) {
           throw new BadRequestException(
-            `Insufficient stock for product ${product.name}. Available: ${product.stockQuantity}, Required: ${item.quantity}`,
+            `Недостаточно запаса для товара ${product.name}. Доступно: ${product.stockQuantity}, требуется: ${item.quantity}`,
           );
         }
 
@@ -333,7 +332,7 @@ export class OrdersService {
     const order = await this.findOne(id);
 
     if (order.status === OrderStatus.DELIVERED) {
-      throw new ForbiddenException('Cannot delete delivered orders');
+      throw new ForbiddenException('Нельзя удалять доставленные заказы');
     }
 
     await this.ordersRepository.remove(order);
