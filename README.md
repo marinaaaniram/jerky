@@ -53,7 +53,7 @@ docker-compose up --build
 
 ```bash
 # На сервере
-docker-compose -f docker-compose.prod.yml up --build -d
+docker compose -f /opt/jerky/docker-compose.prod.yml up --build -d
 
 # Доступ:
 # Frontend:     http://95.81.102.27 (или ваш IP)
