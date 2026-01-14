@@ -44,7 +44,6 @@ const queryClient = new QueryClient({
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const set = useAuthStore((state) => state.login); // Get the set state function
 
   useEffect(() => {
     // Initialize auth state from localStorage on app load

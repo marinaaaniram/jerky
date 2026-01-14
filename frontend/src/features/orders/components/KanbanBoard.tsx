@@ -366,7 +366,7 @@ export function KanbanBoard({ orders, onView, onStatusChange }: KanbanBoardProps
     }
   };
 
-  const activeOrder = activeId ? orders.find((o) => o.id.toString() === activeId) : null;
+  const activeOrder = activeId ? orders.find((o) => o.id.toString() === activeId) ?? null : null;
 
   return (
     <>

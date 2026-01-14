@@ -125,7 +125,7 @@ export function KanbanOrderCard({ order, onView, onStatusChange }: KanbanOrderCa
             )}
 
             {order.status === OrderStatus.TRANSFERRED && (
-              <Alert icon={<IconInfoCircle size={16} />} size="xs" color="orange" title="Статус в работе у курьера">
+              <Alert icon={<IconInfoCircle size={16} />} color="orange" title="Статус в работе у курьера">
                 <Text size="xs">
                   Дальнейшие изменения статуса происходят у курьера до момента доставления заказа.
                 </Text>
