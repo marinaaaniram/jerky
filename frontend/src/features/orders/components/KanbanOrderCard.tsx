@@ -1,5 +1,5 @@
-import { Card, Stack, Text, Badge, Flex, Tooltip, Button, Group, Modal } from '@mantine/core';
-import { IconArrowRight } from '@tabler/icons-react';
+import { Card, Stack, Text, Badge, Flex, Tooltip, Button, Group, Modal, Alert } from '@mantine/core';
+import { IconArrowRight, IconInfoCircle } from '@tabler/icons-react';
 import { useState } from 'react';
 import type { Order } from '../../../types';
 import { OrderStatus } from '../../../types';
@@ -122,6 +122,14 @@ export function KanbanOrderCard({ order, onView, onStatusChange }: KanbanOrderCa
               <Text size="xs" c="dimmed">
                 Курьер: {order.user.firstName} {order.user.lastName}
               </Text>
+            )}
+
+            {order.status === OrderStatus.TRANSFERRED && (
+              <Alert icon={<IconInfoCircle size={16} />} size="xs" color="orange" title="Статус в работе у курьера">
+                <Text size="xs">
+                  Дальнейшие изменения статуса происходят у курьера до момента доставления заказа.
+                </Text>
+              </Alert>
             )}
 
             {nextStatus && onStatusChange && (
