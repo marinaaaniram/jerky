@@ -53,6 +53,8 @@ docker-compose up --build
 
 ```bash
 # На сервере
+docker compose -f /opt/jerky/docker-compose.prod.yml down
+docker system prune -f
 docker compose -f /opt/jerky/docker-compose.prod.yml up --build -d
 
 # Доступ:
