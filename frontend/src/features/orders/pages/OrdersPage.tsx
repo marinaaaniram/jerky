@@ -34,6 +34,7 @@ export function OrdersPage() {
   const { data: orders, isLoading, error } = useOrders();
   const updateStatusMutation = useUpdateOrderStatus();
   const isCourier = useAuthStore((state) => state.isCourier());
+  const user = useAuthStore((state) => state.user);
 
   if (error) {
     return (
@@ -47,9 +48,10 @@ export function OrdersPage() {
   if (isCourier) {
     const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
 
+    const courierOrders = orders?.filter((order) => order.userId === user?.id) || [];
     const filteredOrders = selectedStatus
-      ? orders?.filter((order) => order.status === selectedStatus)
-      : orders;
+      ? courierOrders.filter((order) => order.status === selectedStatus)
+      : courierOrders;
 
     const statuses = [
       OrderStatus.NEW,

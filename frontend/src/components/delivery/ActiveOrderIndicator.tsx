@@ -1,5 +1,5 @@
 import { Badge, Group, Text, Paper, Stack, Button, Box } from '@mantine/core';
-import { IconTruck, IconMapPin, IconPackage, IconX, IconChevronUp } from '@tabler/icons-react';
+import { IconTruck, IconMapPin, IconPackage, IconX, IconChevronUp, IconChevronDown } from '@tabler/icons-react';
 import { useOrders } from '../../features/orders/hooks/useOrders';
 import { useAuthStore } from '../../store/authStore';
 import { OrderStatus } from '../../types';
@@ -12,21 +12,33 @@ export function ActiveOrderIndicator() {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
   const isMobile = useMediaQuery('(max-width: 768px)') || false;
-  
+
   const isCourier = user?.role.name === 'Курьер';
-  
+
   if (!isCourier || isLoading) {
     return null;
   }
 
-  // Получаем первый активный заказ курьера (со статусом "Передан курьеру")
-  const activeOrder = orders?.find(
-    (order) => order.status === OrderStatus.TRANSFERRED
-  );
+  // Получаем все активные заказы текущего курьера (со статусом "Передан курьеру")
+  const courierActiveOrders = orders?.filter(
+    (order) => order.status === OrderStatus.TRANSFERRED && order.userId === user?.id
+  ) || [];
 
-  if (!activeOrder) {
+  if (courierActiveOrders.length === 0) {
     return null;
+  }
+
+  const activeOrder = courierActiveOrders[currentOrderIndex];
+  const totalActiveOrders = courierActiveOrders.length;
+
+  const handleNextOrder = () => {
+    setCurrentOrderIndex((prev) => (prev + 1) % totalActiveOrders);
+  };
+
+  const handlePrevOrder = () => {
+    setCurrentOrderIndex((prev) => (prev - 1 + totalActiveOrders) % totalActiveOrders);
   }
 
   const customerAddress = activeOrder.customer.address || 'Адрес не указан';
@@ -83,18 +95,30 @@ export function ActiveOrderIndicator() {
             <IconTruck size={isMobile ? 20 : 24} />
             <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
               <Text size={isMobile ? "sm" : "lg"} fw={700} truncate>
-                Активный заказ
+                Активные заказы
               </Text>
-              <Badge 
-                size={isMobile ? "sm" : "lg"} 
-                variant="filled" 
-                color="white" 
-                c="orange" 
-                mt={4}
-                style={{ width: 'fit-content' }}
-              >
-                Заказ #{activeOrder.id}
-              </Badge>
+              <Group gap={4} mt={4}>
+                <Badge
+                  size={isMobile ? "sm" : "lg"}
+                  variant="filled"
+                  color="white"
+                  c="orange"
+                  style={{ width: 'fit-content' }}
+                >
+                  Заказ #{activeOrder.id}
+                </Badge>
+                {totalActiveOrders > 1 && (
+                  <Badge
+                    size={isMobile ? "xs" : "sm"}
+                    variant="light"
+                    color="white"
+                    c="white"
+                    style={{ width: 'fit-content' }}
+                  >
+                    {currentOrderIndex + 1}/{totalActiveOrders}
+                  </Badge>
+                )}
+              </Group>
             </Stack>
           </Group>
           <Button
@@ -145,6 +169,29 @@ export function ActiveOrderIndicator() {
             </Text>
           </Group>
         </Stack>
+
+        {totalActiveOrders > 1 && (
+          <Group gap="xs" justify="space-between">
+            <Button
+              variant="default"
+              color="white"
+              size={isMobile ? "xs" : "sm"}
+              onClick={handlePrevOrder}
+              leftSection={<IconChevronUp size={isMobile ? 14 : 16} />}
+            >
+              Предыдущий
+            </Button>
+            <Button
+              variant="default"
+              color="white"
+              size={isMobile ? "xs" : "sm"}
+              onClick={handleNextOrder}
+              rightSection={<IconChevronDown size={isMobile ? 14 : 16} />}
+            >
+              Следующий
+            </Button>
+          </Group>
+        )}
 
         <Button
           variant="filled"

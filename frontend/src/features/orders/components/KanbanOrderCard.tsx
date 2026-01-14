@@ -41,7 +41,7 @@ export function KanbanOrderCard({ order, onView, onStatusChange }: KanbanOrderCa
       case OrderStatus.ASSEMBLING:
         return OrderStatus.TRANSFERRED;
       case OrderStatus.TRANSFERRED:
-        return OrderStatus.DELIVERED;
+        return null;
       default:
         return null;
     }
